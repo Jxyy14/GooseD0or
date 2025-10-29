@@ -98,27 +98,6 @@ Students can submit salaries in CAD or USD, helping international students and t
 
 ---
 
-## 📊 Sample Data
-
-The repository includes sample data:
-- 4 sample co-op offers (Google, Amazon, Microsoft, Meta)
-- 11 blacklisted companies with detailed reports
-- All data is community-submitted and anonymized
-
----
-
-## 🤝 Contributing
-
-This is a student-run community project! Contributions are welcome:
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
----
-
 ## 🔒 Privacy & Security
 
 - **No personal data stored** - All submissions are anonymous
@@ -138,7 +117,7 @@ MIT License - Feel free to use this for your own school or community!
 
 **Jaffer Wehliye**
 
-- 🔗 LinkedIn: [Jaffer Wehliye](https://www.linkedin.com/in/jaffer-wehliye)
+- 🔗 LinkedIn: [Jaffer Wehliye](https://www.linkedin.com/in/jwehliye/)
 - 🐦 Twitter/X: [@wehliyejaffer](https://twitter.com/wehliyejaffer)
 - 📸 Instagram: [@jw14_](https://instagram.com/jw14_)
 
