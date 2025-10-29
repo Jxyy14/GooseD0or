@@ -2,7 +2,12 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { AlertCircle, Flag } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { AlertCircle, Flag, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { Navigation } from "@/components/Navigation";
 
@@ -17,6 +22,13 @@ interface BlacklistedCompany {
 export default function HallOfShame() {
   const [companies, setCompanies] = useState<BlacklistedCompany[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formData, setFormData] = useState({
+    company_name: "",
+    reason: "",
+    reported_by: "",
+  });
 
   useEffect(() => {
     fetchBlacklistedCompanies();
@@ -39,20 +51,104 @@ export default function HallOfShame() {
     }
   };
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    try {
+      const { error } = await supabase.from("blacklisted_companies").insert({
+        company_name: formData.company_name,
+        reason: formData.reason,
+        reported_by: formData.reported_by || null,
+      });
+
+      if (error) throw error;
+
+      toast.success("Company reported successfully!");
+      setFormData({ company_name: "", reason: "", reported_by: "" });
+      setIsDialogOpen(false);
+      fetchBlacklistedCompanies();
+    } catch (error: any) {
+      console.error("Error submitting:", error);
+      toast.error("Failed to submit report. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
       
       <main className="container mx-auto px-4 py-8">
-        <div className="text-center mb-12">
+        <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-2 mb-4">
             <AlertCircle className="h-10 w-10 text-destructive" />
             <h1 className="text-4xl font-bold">Hall of Shame</h1>
           </div>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-muted-foreground max-w-2xl mx-auto mb-6">
             Companies reported by students for unacceptable practices, broken promises, or toxic work environments.
             These entries are community-submitted and unverified.
           </p>
+          
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogTrigger asChild>
+              <Button variant="destructive" size="lg" className="gap-2">
+                <Flag className="h-5 w-5" />
+                Report a Company
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl">
+              <DialogHeader>
+                <DialogTitle>Report a Company</DialogTitle>
+                <DialogDescription>
+                  Share your experience to help fellow students. All reports are anonymous unless you choose to identify yourself.
+                </DialogDescription>
+              </DialogHeader>
+              
+              <form onSubmit={handleSubmit} className="space-y-4 mt-4">
+                <div className="space-y-2">
+                  <Label htmlFor="company_name">Company Name *</Label>
+                  <Input
+                    id="company_name"
+                    required
+                    value={formData.company_name}
+                    onChange={(e) => setFormData({ ...formData, company_name: e.target.value })}
+                    placeholder="e.g., Bad Company Inc."
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="reason">Reason for Reporting *</Label>
+                  <Textarea
+                    id="reason"
+                    required
+                    value={formData.reason}
+                    onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
+                    placeholder="Describe the issues you experienced (unprofessional behavior, broken promises, toxic work environment, etc.)"
+                    rows={6}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="reported_by">Your Name/Identifier (Optional)</Label>
+                  <Input
+                    id="reported_by"
+                    value={formData.reported_by}
+                    onChange={(e) => setFormData({ ...formData, reported_by: e.target.value })}
+                    placeholder="e.g., Co-op Student, Anonymous, etc."
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Leave blank to remain completely anonymous
+                  </p>
+                </div>
+
+                <Button type="submit" className="w-full" disabled={isSubmitting}>
+                  {isSubmitting ? "Submitting..." : "Submit Report"}
+                </Button>
+              </form>
+            </DialogContent>
+          </Dialog>
         </div>
 
         <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4 mb-8">
