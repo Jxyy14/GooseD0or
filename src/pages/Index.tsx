@@ -5,7 +5,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Navigation } from "@/components/Navigation";
 import { supabase } from "@/integrations/supabase/client";
 import { Database, TrendingUp, Users, Sparkles, ArrowRight } from "lucide-react";
-import heroBg from "@/assets/hero-bg.jpg";
 
 export default function Index() {
   const [stats, setStats] = useState({ totalOffers: 0, avgSalary: 0, companies: 0 });
@@ -35,11 +34,7 @@ export default function Index() {
 
       {/* Hero Section */}
       <section className="relative overflow-hidden">
-        <div 
-          className="absolute inset-0 bg-cover bg-center opacity-20"
-          style={{ backgroundImage: `url(${heroBg})` }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/90 to-background" />
+        <div className="absolute inset-0 bg-gradient-to-b from-background via-background to-background" />
         
         <div className="relative container mx-auto px-4 py-24 text-center">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6">
