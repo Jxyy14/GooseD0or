@@ -13,6 +13,26 @@ type Offer = {
   role_title: string;
 };
 
+const renderCustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, name, value }: any) => {
+  const RADIAN = Math.PI / 180;
+  const radius = outerRadius + 20;
+  const x = cx + radius * Math.cos(-midAngle * RADIAN);
+  const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+  return (
+    <text 
+      x={x} 
+      y={y} 
+      fill="white" 
+      textAnchor={x > cx ? 'start' : 'end'} 
+      dominantBaseline="central"
+      style={{ fontFamily: "'Inter', sans-serif", fontSize: '14px', fontWeight: '500' }}
+    >
+      {`${name}: ${value}`}
+    </text>
+  );
+};
+
 export default function Analytics() {
   const [offers, setOffers] = useState<Offer[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -164,8 +184,8 @@ export default function Analytics() {
 
           <Card className="border-border">
             <CardHeader>
-              <CardTitle>Popular Tech Stacks</CardTitle>
-              <CardDescription>Most commonly used technologies</CardDescription>
+              <CardTitle style={{ fontFamily: "'Playfair Display', serif" }}>Popular Tech Stacks</CardTitle>
+              <CardDescription style={{ fontFamily: "'Inter', sans-serif" }}>Most commonly used technologies</CardDescription>
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={300}>
@@ -177,7 +197,8 @@ export default function Analytics() {
                     cx="50%"
                     cy="50%"
                     outerRadius={100}
-                    label
+                    label={renderCustomLabel}
+                    labelLine={{stroke: 'rgba(255,255,255,0.5)', strokeWidth: 1}}
                   >
                     {topTechStacks.map((_, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -188,6 +209,8 @@ export default function Analytics() {
                       backgroundColor: "hsl(var(--card))",
                       borderColor: "hsl(var(--border))",
                       borderRadius: "8px",
+                      fontFamily: "'Inter', sans-serif",
+                      color: "#fff",
                     }}
                   />
                 </PieChart>

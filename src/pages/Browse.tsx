@@ -26,6 +26,8 @@ type Offer = {
   level: string | null;
   work_type: string | null;
   is_verified: boolean;
+  program: string | null;
+  year_of_study: string | null;
 };
 
 export default function Browse() {
@@ -365,6 +367,13 @@ export default function Browse() {
                         {offer.level && <Badge variant="outline" className="text-xs">{offer.level}</Badge>}
                         {offer.work_type && <Badge variant="outline" className="text-xs">{offer.work_type}</Badge>}
                       </div>
+                      {(offer.program || offer.year_of_study) && (
+                        <p className="text-sm text-muted-foreground mt-1">
+                          {offer.program && offer.year_of_study 
+                            ? `${offer.program} • ${offer.year_of_study}`
+                            : offer.program || offer.year_of_study}
+                        </p>
+                      )}
                     </div>
 
                     <div className="space-y-2 text-sm">
@@ -378,7 +387,7 @@ export default function Browse() {
                       </div>
                       <div className="flex items-center gap-2 font-semibold text-primary">
                         <DollarSign className="h-4 w-4" />
-                        ${offer.salary_hourly}/hr
+                        ${offer.salary_hourly}/hr <span className="text-xs text-muted-foreground">(CAD/USD)</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <Star className="h-4 w-4 fill-primary text-primary" />
