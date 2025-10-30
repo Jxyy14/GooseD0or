@@ -12,12 +12,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Loader2, Check, ChevronsUpDown } from "lucide-react";
 import { UNIVERSITIES, detectUniversityFromEmail } from "@/lib/universities";
+import { TECHNOLOGIES } from "@/lib/technologies";
 import { cn } from "@/lib/utils";
 
-const TECH_STACK_OPTIONS = [
-  "React", "TypeScript", "Python", "Java", "C++", "JavaScript", "Go", "Rust",
-  "Node.js", "AWS", "Docker", "Kubernetes", "PostgreSQL", "MongoDB", "GraphQL"
-];
+// Removed - using TECHNOLOGIES from lib/technologies.ts now
 
 const JOB_TYPE_OPTIONS = ["SWE", "PM", "ML", "DS", "Quant", "IT", "Other"];
 const LEVEL_OPTIONS = ["Junior", "Returning Co-op", "Grad Pipeline"];
@@ -46,6 +44,8 @@ export default function Submit() {
     university: "",
   });
   const [universityOpen, setUniversityOpen] = useState(false);
+  const [customUniversityMode, setCustomUniversityMode] = useState(false);
+  const [techStackOpen, setTechStackOpen] = useState(false);
   const [verificationEmail, setVerificationEmail] = useState("");
   const [honeypot, setHoneypot] = useState(""); // Bot trap
   const [formStartTime, setFormStartTime] = useState<number>(0);
@@ -97,13 +97,20 @@ export default function Submit() {
     }
   }, [navigate]);
 
-  const toggleTechStack = (tech: string) => {
+  const removeTechStack = (tech: string) => {
     setFormData(prev => ({
       ...prev,
-      tech_stack: prev.tech_stack.includes(tech)
-        ? prev.tech_stack.filter(t => t !== tech)
-        : [...prev.tech_stack, tech]
+      tech_stack: prev.tech_stack.filter(t => t !== tech)
     }));
+  };
+
+  const addTechStack = (tech: string) => {
+    if (!formData.tech_stack.includes(tech)) {
+      setFormData(prev => ({
+        ...prev,
+        tech_stack: [...prev.tech_stack, tech]
+      }));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -183,7 +190,7 @@ export default function Submit() {
         location: formData.location,
         salary_hourly: parseFloat(formData.salary_hourly),
         tech_stack: formData.tech_stack,
-        experience_rating: parseInt(formData.experience_rating),
+        experience_rating: formData.experience_rating ? parseInt(formData.experience_rating) : null,
         review_text: formData.review_text || null,
         program: formData.program || null,
         year_of_study: formData.year_of_study || null,
@@ -327,15 +334,15 @@ export default function Submit() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="rating">Experience Rating (1-5) *</Label>
+                  <Label htmlFor="rating">Experience Rating (1-5) (Optional)</Label>
                   <Input
                     id="rating"
                     type="number"
                     min="1"
                     max="5"
-                    required
                     value={formData.experience_rating}
                     onChange={(e) => setFormData({ ...formData, experience_rating: e.target.value })}
+                    placeholder="1-5"
                   />
                 </div>
 
@@ -361,48 +368,81 @@ export default function Submit() {
                 
                 <div className="space-y-2">
                   <Label htmlFor="university">University (Optional)</Label>
-                  <Popover open={universityOpen} onOpenChange={setUniversityOpen}>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        role="combobox"
-                        aria-expanded={universityOpen}
-                        className="w-full justify-between"
+                  {customUniversityMode ? (
+                    <div className="space-y-2">
+                      <Input
+                        id="university-custom"
+                        value={formData.university}
+                        onChange={(e) => setFormData({ ...formData, university: e.target.value })}
+                        placeholder="Type your university name"
+                        maxLength={100}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setCustomUniversityMode(false)}
+                        className="text-xs text-primary hover:underline"
                       >
-                        {formData.university || "Select university..."}
-                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-full p-0">
-                      <Command>
-                        <CommandInput placeholder="Search university..." />
-                        <CommandEmpty>No university found.</CommandEmpty>
-                        <CommandGroup className="max-h-64 overflow-auto">
-                          {UNIVERSITIES.map((university) => (
-                            <CommandItem
-                              key={university}
-                              value={university}
-                              onSelect={(currentValue) => {
-                                setFormData({ ...formData, university: currentValue === formData.university.toLowerCase() ? "" : university });
-                                setUniversityOpen(false);
-                              }}
-                            >
-                              <Check
-                                className={cn(
-                                  "mr-2 h-4 w-4",
-                                  formData.university === university ? "opacity-100" : "opacity-0"
-                                )}
-                              />
-                              {university}
-                            </CommandItem>
-                          ))}
-                        </CommandGroup>
-                      </Command>
-                    </PopoverContent>
-                  </Popover>
-                  <p className="text-xs text-muted-foreground">
-                    {formData.university ? "Auto-detected from your email" : "Select your university from the list"}
-                  </p>
+                        ← Back to list
+                      </button>
+                    </div>
+                  ) : (
+                    <>
+                      <Popover open={universityOpen} onOpenChange={setUniversityOpen}>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            role="combobox"
+                            aria-expanded={universityOpen}
+                            className="w-full justify-between"
+                          >
+                            {formData.university || "Select university..."}
+                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-full p-0">
+                          <Command>
+                            <CommandInput placeholder="Search university..." />
+                            <CommandEmpty>No university found.</CommandEmpty>
+                            <CommandGroup className="max-h-64 overflow-auto">
+                              {UNIVERSITIES.map((university) => (
+                                <CommandItem
+                                  key={university}
+                                  value={university}
+                                  onSelect={(currentValue) => {
+                                    setFormData({ ...formData, university: currentValue === formData.university.toLowerCase() ? "" : university });
+                                    setUniversityOpen(false);
+                                  }}
+                                >
+                                  <Check
+                                    className={cn(
+                                      "mr-2 h-4 w-4",
+                                      formData.university === university ? "opacity-100" : "opacity-0"
+                                    )}
+                                  />
+                                  {university}
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
+                      <div className="flex items-center justify-between text-xs text-muted-foreground">
+                        <span>
+                          {formData.university && !customUniversityMode ? "Auto-detected from your email" : "Select from 100+ universities"}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setCustomUniversityMode(true);
+                            setFormData({ ...formData, university: "" });
+                          }}
+                          className="text-primary hover:underline"
+                        >
+                          Can't see your college?
+                        </button>
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
 
@@ -455,19 +495,74 @@ export default function Submit() {
 
               <div className="space-y-2">
                 <Label>Tech Stack (Optional)</Label>
-                <div className="flex flex-wrap gap-2">
-                  {TECH_STACK_OPTIONS.map((tech) => (
+                <Popover open={techStackOpen} onOpenChange={setTechStackOpen}>
+                  <PopoverTrigger asChild>
                     <Button
-                      key={tech}
-                      type="button"
-                      variant={formData.tech_stack.includes(tech) ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => toggleTechStack(tech)}
+                      variant="outline"
+                      role="combobox"
+                      aria-expanded={techStackOpen}
+                      className="w-full justify-between"
                     >
-                      {tech}
+                      {formData.tech_stack.length > 0 
+                        ? `${formData.tech_stack.length} selected`
+                        : "Select technologies..."}
+                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                     </Button>
-                  ))}
-                </div>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-full p-0">
+                    <Command>
+                      <CommandInput placeholder="Search technologies..." />
+                      <CommandEmpty>No technology found.</CommandEmpty>
+                      <CommandGroup className="max-h-64 overflow-auto">
+                        {TECHNOLOGIES.map((tech) => (
+                          <CommandItem
+                            key={tech}
+                            value={tech}
+                            onSelect={() => {
+                              if (formData.tech_stack.includes(tech)) {
+                                removeTechStack(tech);
+                              } else {
+                                addTechStack(tech);
+                              }
+                            }}
+                          >
+                            <Check
+                              className={cn(
+                                "mr-2 h-4 w-4",
+                                formData.tech_stack.includes(tech) ? "opacity-100" : "opacity-0"
+                              )}
+                            />
+                            {tech}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+                
+                {/* Show selected tech stack */}
+                {formData.tech_stack.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {formData.tech_stack.map((tech) => (
+                      <div
+                        key={tech}
+                        className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary rounded-md text-sm"
+                      >
+                        {tech}
+                        <button
+                          type="button"
+                          onClick={() => removeTechStack(tech)}
+                          className="hover:bg-primary/20 rounded-full p-0.5"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <p className="text-xs text-muted-foreground">
+                  Search from 300+ technologies
+                </p>
               </div>
 
               <div className="space-y-2">
