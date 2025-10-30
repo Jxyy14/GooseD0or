@@ -64,8 +64,11 @@ export default function Submit() {
       
       // Verify email domain
       const email = user.email?.toLowerCase() || "";
-      if (!email.endsWith('.edu') && !email.endsWith('@uwaterloo.ca')) {
-        toast.error("Only .edu and @uwaterloo.ca emails can submit offers");
+      const isAcademicEmail = email.endsWith('.edu') || email.endsWith('.edu.au') || 
+                             email.endsWith('.ca') || email.endsWith('.ac.uk');
+      
+      if (!isAcademicEmail) {
+        toast.error("Only university emails are allowed (.edu, .edu.au, .ca, .ac.uk)");
         await supabase.auth.signOut();
         navigate("/login");
         return;

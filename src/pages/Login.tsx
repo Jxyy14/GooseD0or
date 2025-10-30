@@ -18,11 +18,13 @@ export default function Login() {
   const [emailError, setEmailError] = useState("");
 
   const validateEmail = (email: string) => {
-    const isEdu = email.toLowerCase().endsWith('.edu');
-    const isUWaterloo = email.toLowerCase().endsWith('@uwaterloo.ca');
+    const emailLower = email.toLowerCase();
     
-    if (!isEdu && !isUWaterloo) {
-      setEmailError("Only .edu and @uwaterloo.ca emails are allowed");
+    const isAcademicEmail = emailLower.endsWith('.edu') || emailLower.endsWith('.edu.au') || 
+                           emailLower.endsWith('.ca') || emailLower.endsWith('.ac.uk');
+    
+    if (!isAcademicEmail) {
+      setEmailError("Only university emails are allowed (.edu, .edu.au, .ca, .ac.uk)");
       return false;
     }
     

@@ -21,9 +21,6 @@ export default function Signup() {
   const [passwordError, setPasswordError] = useState("");
 
   const validateEmail = (email: string) => {
-    const isEdu = email.toLowerCase().endsWith('.edu');
-    const isUWaterloo = email.toLowerCase().endsWith('@uwaterloo.ca');
-    
     if (!email) {
       setEmailError("");
       return false;
@@ -36,16 +33,26 @@ export default function Signup() {
       return false;
     }
     
-    if (!isEdu && !isUWaterloo) {
-      setEmailError("Only .edu and @uwaterloo.ca emails are allowed");
+    const emailLower = email.toLowerCase();
+    
+    // Check for academic email domains
+    const isUSEdu = emailLower.endsWith('.edu');
+    const isAustraliaEdu = emailLower.endsWith('.edu.au');
+    const isCanadaEdu = emailLower.endsWith('.ca');
+    const isUKEdu = emailLower.endsWith('.ac.uk');
+    
+    const isAcademicEmail = isUSEdu || isAustraliaEdu || isCanadaEdu || isUKEdu;
+    
+    if (!isAcademicEmail) {
+      setEmailError("Only university emails are allowed (.edu, .edu.au, .ca, .ac.uk)");
       return false;
     }
     
     // Check for common typos in domains
-    const domain = email.toLowerCase().split('@')[1];
+    const domain = emailLower.split('@')[1];
     const commonTypos = ['gmial.com', 'gmai.com', 'yahooo.com', 'hotmial.com'];
     if (commonTypos.includes(domain)) {
-      setEmailError("Did you mean gmail.com or yahoo.com? (Note: Only .edu emails are allowed)");
+      setEmailError("Did you mean gmail.com or yahoo.com? (Note: Only university emails are allowed)");
       return false;
     }
     
