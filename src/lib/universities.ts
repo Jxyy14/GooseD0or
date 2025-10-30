@@ -104,6 +104,7 @@ export const UNIVERSITIES = [
   "University of Tokyo",
   "University of Melbourne",
   "University of Sydney",
+  "University of New South Wales",
   "Australian National University",
 ].sort();
 
@@ -176,6 +177,11 @@ export const EMAIL_TO_UNIVERSITY: Record<string, string> = {
   "asu.edu": "Arizona State University",
   "rice.edu": "Rice University",
   "vanderbilt.edu": "Vanderbilt University",
+  
+  // Australian Universities
+  "unsw.edu.au": "University of New South Wales",
+  "student.unsw.edu.au": "University of New South Wales",
+  "ad.unsw.edu.au": "University of New South Wales",
 };
 
 // Function to detect university from email

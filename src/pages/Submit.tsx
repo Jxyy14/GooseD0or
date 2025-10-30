@@ -45,6 +45,7 @@ export default function Submit() {
   });
   const [universityOpen, setUniversityOpen] = useState(false);
   const [customUniversityMode, setCustomUniversityMode] = useState(false);
+  const [isUniversityLocked, setIsUniversityLocked] = useState(false);
   const [techStackOpen, setTechStackOpen] = useState(false);
   const [customJobType, setCustomJobType] = useState("");
   const [honeypot, setHoneypot] = useState(""); // Bot trap
@@ -78,6 +79,7 @@ export default function Submit() {
         const detectedUniversity = detectUniversityFromEmail(user.email);
         if (detectedUniversity) {
           setFormData(prev => ({ ...prev, university: detectedUniversity }));
+          setIsUniversityLocked(true); // Lock the field when auto-detected
         }
       }
     };
@@ -363,7 +365,19 @@ export default function Submit() {
                 
                 <div className="space-y-2">
                   <Label htmlFor="university">University (Optional)</Label>
-                  {customUniversityMode ? (
+                  {isUniversityLocked ? (
+                    <div className="space-y-2">
+                      <Input
+                        id="university-locked"
+                        value={formData.university}
+                        disabled
+                        className="bg-muted cursor-not-allowed"
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        🔒 Locked to your university based on your email address
+                      </p>
+                    </div>
+                  ) : customUniversityMode ? (
                     <div className="space-y-2">
                       <Input
                         id="university-custom"
@@ -423,7 +437,7 @@ export default function Submit() {
                       </Popover>
                       <div className="flex items-center justify-between text-xs text-muted-foreground">
                         <span>
-                          {formData.university && !customUniversityMode ? "Auto-detected from your email" : "Select from 100+ universities"}
+                          Select from 100+ universities
                         </span>
                         <button
                           type="button"

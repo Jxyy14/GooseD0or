@@ -11,7 +11,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Loader2, Check, ChevronsUpDown, ArrowLeft } from "lucide-react";
-import { UNIVERSITIES } from "@/lib/universities";
+import { UNIVERSITIES, detectUniversityFromEmail } from "@/lib/universities";
 import { TECHNOLOGIES } from "@/lib/technologies";
 import { cn } from "@/lib/utils";
 
@@ -44,6 +44,7 @@ export default function Edit() {
   });
   const [universityOpen, setUniversityOpen] = useState(false);
   const [customUniversityMode, setCustomUniversityMode] = useState(false);
+  const [isUniversityLocked, setIsUniversityLocked] = useState(false);
   const [techStackOpen, setTechStackOpen] = useState(false);
   const [customJobType, setCustomJobType] = useState("");
 
@@ -109,6 +110,17 @@ export default function Edit() {
       // Check if university is custom (not in the list)
       if (data.university && !UNIVERSITIES.includes(data.university)) {
         setCustomUniversityMode(true);
+      }
+
+      // Check if university was auto-detected from email - if so, lock it
+      if (data.university && userId) {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user?.email) {
+          const detectedUniversity = detectUniversityFromEmail(user.email);
+          if (detectedUniversity === data.university) {
+            setIsUniversityLocked(true);
+          }
+        }
       }
     } catch (error) {
       console.error("Error fetching offer:", error);
@@ -338,7 +350,19 @@ export default function Edit() {
                 
                 <div className="space-y-2">
                   <Label htmlFor="university">University (Optional)</Label>
-                  {customUniversityMode ? (
+                  {isUniversityLocked ? (
+                    <div className="space-y-2">
+                      <Input
+                        id="university-locked"
+                        value={formData.university}
+                        disabled
+                        className="bg-muted cursor-not-allowed"
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        🔒 Locked to your university based on your email address
+                      </p>
+                    </div>
+                  ) : customUniversityMode ? (
                     <div className="space-y-2">
                       <Input
                         id="university-custom"
