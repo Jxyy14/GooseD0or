@@ -46,7 +46,7 @@ export default function Submit() {
   const [universityOpen, setUniversityOpen] = useState(false);
   const [customUniversityMode, setCustomUniversityMode] = useState(false);
   const [techStackOpen, setTechStackOpen] = useState(false);
-  const [verificationEmail, setVerificationEmail] = useState("");
+  const [customJobType, setCustomJobType] = useState("");
   const [honeypot, setHoneypot] = useState(""); // Bot trap
   const [formStartTime, setFormStartTime] = useState<number>(0);
 
@@ -184,6 +184,9 @@ export default function Submit() {
         return;
       }
 
+      // Check if user has UWaterloo email for verified badge
+      const isUWaterlooVerified = user.email?.toLowerCase().endsWith('@uwaterloo.ca') || false;
+
       const { data: newOffer, error} = await supabase.from("offers").insert({
         company_name: formData.company_name,
         role_title: formData.role_title,
@@ -195,10 +198,11 @@ export default function Submit() {
         program: formData.program || null,
         year_of_study: formData.year_of_study || null,
         term: formData.term,
-        job_type: formData.job_type || null,
+        job_type: customJobType || formData.job_type || null,
         level: formData.level || null,
         work_type: formData.work_type || null,
         university: formData.university || null,
+        verified_uwaterloo: isUWaterlooVerified,
         user_id: user.id,
         user_email: user.email,
       }).select().single();
@@ -208,18 +212,8 @@ export default function Submit() {
       // Store submission time for rate limiting
       localStorage.setItem("lastSubmissionTime", Date.now().toString());
 
-      // Send verification email if provided
-      if (verificationEmail.trim()) {
-        const { error: emailError } = await supabase.functions.invoke("send-verification", {
-          body: { email: verificationEmail, offerId: newOffer.id },
-        });
-
-        if (emailError) {
-          console.error("Email error:", emailError);
-          toast.warning("Offer submitted but verification email failed to send");
-        } else {
-          toast.success("Offer submitted! Check your email to verify. 📧");
-        }
+      if (isUWaterlooVerified) {
+        toast.success("Offer submitted with ✅ UWaterloo verification! 🎉");
       } else {
         toast.success("Offer submitted successfully! 🎉");
       }
@@ -449,17 +443,39 @@ export default function Submit() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="job_type">Job Type</Label>
-                  <select
-                    id="job_type"
-                    value={formData.job_type}
-                    onChange={(e) => setFormData({ ...formData, job_type: e.target.value })}
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                  >
-                    <option value="">Select type</option>
-                    {JOB_TYPE_OPTIONS.map((type) => (
-                      <option key={type} value={type}>{type}</option>
-                    ))}
-                  </select>
+                  {formData.job_type === "Other" ? (
+                    <div className="space-y-2">
+                      <Input
+                        id="job_type_custom"
+                        value={customJobType}
+                        onChange={(e) => setCustomJobType(e.target.value)}
+                        placeholder="Enter job type"
+                        maxLength={50}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setFormData({ ...formData, job_type: "" });
+                          setCustomJobType("");
+                        }}
+                        className="text-xs text-primary hover:underline"
+                      >
+                        ← Back to list
+                      </button>
+                    </div>
+                  ) : (
+                    <select
+                      id="job_type"
+                      value={formData.job_type}
+                      onChange={(e) => setFormData({ ...formData, job_type: e.target.value })}
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    >
+                      <option value="">Select type</option>
+                      {JOB_TYPE_OPTIONS.map((type) => (
+                        <option key={type} value={type}>{type}</option>
+                      ))}
+                    </select>
+                  )}
                 </div>
 
                 <div className="space-y-2">
@@ -602,22 +618,14 @@ export default function Submit() {
                 />
               </div>
 
-              <div className="space-y-2 border-t pt-4">
-                <Label htmlFor="verification_email" className="flex items-center gap-2">
-                  <span>UWaterloo Email (Optional)</span>
-                  <span className="text-xs text-muted-foreground">Get ✅ Verified badge</span>
-                </Label>
-                <Input
-                  id="verification_email"
-                  type="email"
-                  value={verificationEmail}
-                  onChange={(e) => setVerificationEmail(e.target.value)}
-                  placeholder="yourname@uwaterloo.ca"
-                />
-                <p className="text-xs text-muted-foreground">
-                  We'll send a verification link to confirm you're a UWaterloo student. Your email won't be stored.
-                </p>
-              </div>
+              {user?.email?.toLowerCase().endsWith('@uwaterloo.ca') && (
+                <div className="border-t pt-4">
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <span className="text-green-600">✅</span>
+                    <span>This submission will be marked as UWaterloo verified</span>
+                  </div>
+                </div>
+              )}
 
               <Button
                 type="submit"

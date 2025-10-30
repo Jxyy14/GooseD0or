@@ -26,8 +26,10 @@ type Offer = {
   level: string | null;
   work_type: string | null;
   is_verified: boolean;
+  verified_uwaterloo: boolean;
   program: string | null;
   year_of_study: string | null;
+  university: string | null;
 };
 
 export default function Browse() {
@@ -357,11 +359,21 @@ export default function Browse() {
                       <h3 className="font-bold text-lg flex items-center gap-2">
                         <Building2 className="h-5 w-5 text-primary" />
                         {offer.company_name}
-                        {offer.is_verified && (
-                          <span className="text-xs" title="Verified Waterloo student">✅</span>
+                        {offer.verified_uwaterloo && (
+                          <span 
+                            className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-yellow-500/10 text-yellow-600 border border-yellow-500/20" 
+                            title="Verified UWaterloo student"
+                          >
+                            🪿 UW
+                          </span>
                         )}
                       </h3>
                       <p className="text-foreground/80">{offer.role_title}</p>
+                      {offer.university && (
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                          {offer.university}
+                        </p>
+                      )}
                       <div className="flex gap-2 mt-1 flex-wrap">
                         {offer.job_type && <Badge variant="outline" className="text-xs">{offer.job_type}</Badge>}
                         {offer.level && <Badge variant="outline" className="text-xs">{offer.level}</Badge>}
