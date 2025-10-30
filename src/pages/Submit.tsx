@@ -6,9 +6,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
+import { Loader2, Check, ChevronsUpDown } from "lucide-react";
+import { UNIVERSITIES, detectUniversityFromEmail } from "@/lib/universities";
+import { cn } from "@/lib/utils";
 
 const TECH_STACK_OPTIONS = [
   "React", "TypeScript", "Python", "Java", "C++", "JavaScript", "Go", "Rust",
@@ -39,7 +43,9 @@ export default function Submit() {
     job_type: "",
     level: "",
     work_type: "",
+    university: "",
   });
+  const [universityOpen, setUniversityOpen] = useState(false);
   const [verificationEmail, setVerificationEmail] = useState("");
   const [honeypot, setHoneypot] = useState(""); // Bot trap
   const [formStartTime, setFormStartTime] = useState<number>(0);
@@ -66,6 +72,14 @@ export default function Submit() {
       
       setUser(user);
       setIsCheckingAuth(false);
+      
+      // Auto-detect university from email
+      if (user.email) {
+        const detectedUniversity = detectUniversityFromEmail(user.email);
+        if (detectedUniversity) {
+          setFormData(prev => ({ ...prev, university: detectedUniversity }));
+        }
+      }
     };
     
     checkAuth();
@@ -163,7 +177,7 @@ export default function Submit() {
         return;
       }
 
-      const { data: newOffer, error } = await supabase.from("offers").insert({
+      const { data: newOffer, error} = await supabase.from("offers").insert({
         company_name: formData.company_name,
         role_title: formData.role_title,
         location: formData.location,
@@ -177,6 +191,7 @@ export default function Submit() {
         job_type: formData.job_type || null,
         level: formData.level || null,
         work_type: formData.work_type || null,
+        university: formData.university || null,
         user_id: user.id,
         user_email: user.email,
       }).select().single();
@@ -342,6 +357,52 @@ export default function Submit() {
                     onChange={(e) => setFormData({ ...formData, year_of_study: e.target.value })}
                     placeholder="e.g., 2A"
                   />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="university">University (Optional)</Label>
+                  <Popover open={universityOpen} onOpenChange={setUniversityOpen}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        role="combobox"
+                        aria-expanded={universityOpen}
+                        className="w-full justify-between"
+                      >
+                        {formData.university || "Select university..."}
+                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-full p-0">
+                      <Command>
+                        <CommandInput placeholder="Search university..." />
+                        <CommandEmpty>No university found.</CommandEmpty>
+                        <CommandGroup className="max-h-64 overflow-auto">
+                          {UNIVERSITIES.map((university) => (
+                            <CommandItem
+                              key={university}
+                              value={university}
+                              onSelect={(currentValue) => {
+                                setFormData({ ...formData, university: currentValue === formData.university.toLowerCase() ? "" : university });
+                                setUniversityOpen(false);
+                              }}
+                            >
+                              <Check
+                                className={cn(
+                                  "mr-2 h-4 w-4",
+                                  formData.university === university ? "opacity-100" : "opacity-0"
+                                )}
+                              />
+                              {university}
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                  <p className="text-xs text-muted-foreground">
+                    {formData.university ? "Auto-detected from your email" : "Select your university from the list"}
+                  </p>
                 </div>
               </div>
 
