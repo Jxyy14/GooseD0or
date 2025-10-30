@@ -29,8 +29,23 @@ export default function Signup() {
       return false;
     }
     
+    // Basic email format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setEmailError("Please enter a valid email address");
+      return false;
+    }
+    
     if (!isEdu && !isUWaterloo) {
       setEmailError("Only .edu and @uwaterloo.ca emails are allowed");
+      return false;
+    }
+    
+    // Check for common typos in domains
+    const domain = email.toLowerCase().split('@')[1];
+    const commonTypos = ['gmial.com', 'gmai.com', 'yahooo.com', 'hotmial.com'];
+    if (commonTypos.includes(domain)) {
+      setEmailError("Did you mean gmail.com or yahoo.com? (Note: Only .edu emails are allowed)");
       return false;
     }
     
