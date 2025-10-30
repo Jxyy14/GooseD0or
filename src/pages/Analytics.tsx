@@ -3,7 +3,7 @@ import { Navigation } from "@/components/Navigation";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
-import { TrendingUp, Building2, DollarSign, Award } from "lucide-react";
+import { TrendingUp, Building2, DollarSign, Award, Cpu } from "lucide-react";
 
 type Offer = {
   company_name: string;
@@ -184,8 +184,11 @@ export default function Analytics() {
 
           <Card className="border-border">
             <CardHeader>
-              <CardTitle style={{ fontFamily: "'Playfair Display', serif" }}>Popular Tech Stacks</CardTitle>
-              <CardDescription style={{ fontFamily: "'Inter', sans-serif" }}>Most commonly used technologies</CardDescription>
+              <CardTitle className="flex items-center gap-2">
+                <Cpu className="h-5 w-5 text-primary" />
+                Popular Tech Stacks
+              </CardTitle>
+              <CardDescription>Most commonly used technologies</CardDescription>
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={300}>
