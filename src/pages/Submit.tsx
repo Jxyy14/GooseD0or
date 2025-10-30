@@ -634,15 +634,6 @@ export default function Submit() {
                 />
               </div>
 
-              {user?.email?.toLowerCase().endsWith('@uwaterloo.ca') && (
-                <div className="border-t pt-4">
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <span className="text-green-600">✅</span>
-                    <span>This submission will be marked as UWaterloo verified</span>
-                  </div>
-                </div>
-              )}
-
               <Button
                 type="submit"
                 className="w-full"
