@@ -61,6 +61,9 @@ export function Navigation() {
           <div className="hidden md:flex items-center gap-2">
             {user ? (
               <>
+                <Link to="/my-submissions">
+                  <Button variant="ghost">My Submissions</Button>
+                </Link>
                 <Link to="/submit">
                   <Button>Submit Offer</Button>
                 </Link>
@@ -124,6 +127,9 @@ export function Navigation() {
                     <User className="h-4 w-4 inline mr-2 text-primary" />
                     <span className="font-medium">{user.email}</span>
                   </div>
+                  <Link to="/my-submissions" onClick={() => setIsMenuOpen(false)}>
+                    <Button variant="outline" className="w-full">My Submissions</Button>
+                  </Link>
                   <Link to="/submit" onClick={() => setIsMenuOpen(false)}>
                     <Button className="w-full">Submit Offer</Button>
                   </Link>
