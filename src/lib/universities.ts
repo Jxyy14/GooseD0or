@@ -105,6 +105,7 @@ export const UNIVERSITIES = [
   "University of Melbourne",
   "University of Sydney",
   "University of New South Wales",
+  "University of Technology Sydney",
   "Australian National University",
 ].sort();
 
@@ -182,6 +183,8 @@ export const EMAIL_TO_UNIVERSITY: Record<string, string> = {
   "unsw.edu.au": "University of New South Wales",
   "student.unsw.edu.au": "University of New South Wales",
   "ad.unsw.edu.au": "University of New South Wales",
+  "uts.edu.au": "University of Technology Sydney",
+  "student.uts.edu.au": "University of Technology Sydney",
 };
 
 // Function to detect university from email
