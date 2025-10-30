@@ -112,8 +112,9 @@ export default function Signup() {
     }
   };
 
-  const isEmailValid = email && validateEmail(email);
-  const isPasswordValid = password && validatePassword(password, confirmPassword);
+  // Check email validity without triggering state updates
+  const isEmailValid = email && (email.toLowerCase().endsWith('.edu') || email.toLowerCase().endsWith('@uwaterloo.ca')) && !emailError;
+  const isPasswordValid = password && password.length >= 8 && !passwordError;
 
   return (
     <div className="min-h-screen bg-background">
