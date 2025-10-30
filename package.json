@@ -1,9 +1,9 @@
 {
-  "name": "finance-tracker",
+  "name": "goosedoor",
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "Smart personal finance tracker with OCR receipt scanning and AI categorization",
+  "description": "Anonymous co-op salary database for University of Waterloo students",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
