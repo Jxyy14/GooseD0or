@@ -16,6 +16,7 @@ type Offer = {
   role_title: string;
   location: string;
   salary_hourly: number;
+  currency: string;
   tech_stack: string[];
   experience_rating: number;
   review_text: string | null;
@@ -399,7 +400,7 @@ export default function Browse() {
                       </div>
                       <div className="flex items-center gap-2 font-semibold text-primary">
                         <DollarSign className="h-4 w-4" />
-                        ${offer.salary_hourly}/hr <span className="text-xs text-muted-foreground">(CAD/USD)</span>
+                        ${offer.salary_hourly}/hr <span className="text-xs text-muted-foreground">({offer.currency || 'CAD'})</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <Star className="h-4 w-4 fill-primary text-primary" />

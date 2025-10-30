@@ -192,6 +192,7 @@ export default function Submit() {
         role_title: formData.role_title,
         location: formData.location,
         salary_hourly: parseFloat(formData.salary_hourly),
+        currency: formData.currency,
         tech_stack: formData.tech_stack,
         experience_rating: formData.experience_rating ? parseInt(formData.experience_rating) : null,
         review_text: formData.review_text || null,
