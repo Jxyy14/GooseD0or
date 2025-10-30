@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,6 +22,8 @@ const WORK_TYPE_OPTIONS = ["Remote", "Hybrid", "Onsite"];
 export default function Submit() {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [user, setUser] = useState<any>(null);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [formData, setFormData] = useState({
     company_name: "",
     role_title: "",
@@ -39,6 +41,47 @@ export default function Submit() {
     work_type: "",
   });
   const [verificationEmail, setVerificationEmail] = useState("");
+  const [honeypot, setHoneypot] = useState(""); // Bot trap
+  const [formStartTime, setFormStartTime] = useState<number>(0);
+
+  // Check authentication
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        toast.error("Please log in to submit offers");
+        navigate("/login");
+        return;
+      }
+      
+      // Verify email domain
+      const email = user.email?.toLowerCase() || "";
+      if (!email.endsWith('.edu') && !email.endsWith('@uwaterloo.ca')) {
+        toast.error("Only .edu and @uwaterloo.ca emails can submit offers");
+        await supabase.auth.signOut();
+        navigate("/login");
+        return;
+      }
+      
+      setUser(user);
+      setIsCheckingAuth(false);
+    };
+    
+    checkAuth();
+    setFormStartTime(Date.now());
+    
+    const lastSubmission = localStorage.getItem("lastSubmissionTime");
+    if (lastSubmission) {
+      const timeSinceLastSubmit = Date.now() - parseInt(lastSubmission);
+      const minWaitTime = 2 * 60 * 1000; // 2 minutes
+      
+      if (timeSinceLastSubmit < minWaitTime) {
+        const remainingTime = Math.ceil((minWaitTime - timeSinceLastSubmit) / 1000);
+        toast.error(`Please wait ${remainingTime} seconds before submitting again`);
+      }
+    }
+  }, [navigate]);
 
   const toggleTechStack = (tech: string) => {
     setFormData(prev => ({
@@ -51,9 +94,75 @@ export default function Submit() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Bot protection: honeypot field
+    if (honeypot !== "") {
+      console.log("Bot detected via honeypot");
+      toast.error("Submission failed. Please try again.");
+      return;
+    }
+
+    // Bot protection: check if form was filled too quickly (< 5 seconds)
+    const timeToFillForm = Date.now() - formStartTime;
+    if (timeToFillForm < 5000) {
+      console.log("Bot detected - form filled too quickly");
+      toast.error("Please take your time filling out the form.");
+      return;
+    }
+
+    // Validation: Check salary limit (max $300/hour)
+    const salary = parseFloat(formData.salary_hourly);
+    if (salary > 300) {
+      toast.error("Maximum hourly rate is $300/hour. Please enter a realistic co-op salary.");
+      return;
+    }
+    if (salary < 10) {
+      toast.error("Minimum hourly rate is $10/hour. Please check your entry.");
+      return;
+    }
+
+    // Validation: Check review word count (max 150 words)
+    if (formData.review_text.trim()) {
+      const wordCount = formData.review_text.trim().split(/\s+/).length;
+      if (wordCount > 150) {
+        toast.error(`Review is too long (${wordCount} words). Please limit to 150 words or less.`);
+        return;
+      }
+    }
+
+    // Validation: Check field lengths
+    if (formData.company_name.trim().length < 2) {
+      toast.error("Company name must be at least 2 characters.");
+      return;
+    }
+    if (formData.company_name.length > 100) {
+      toast.error("Company name is too long (max 100 characters).");
+      return;
+    }
+
+    // Rate limiting check
+    const lastSubmission = localStorage.getItem("lastSubmissionTime");
+    if (lastSubmission) {
+      const timeSinceLastSubmit = Date.now() - parseInt(lastSubmission);
+      const minWaitTime = 2 * 60 * 1000; // 2 minutes between submissions
+      
+      if (timeSinceLastSubmit < minWaitTime) {
+        const remainingTime = Math.ceil((minWaitTime - timeSinceLastSubmit) / 1000);
+        toast.error(`Please wait ${remainingTime} seconds before submitting again`);
+        return;
+      }
+    }
+
     setIsSubmitting(true);
 
     try {
+      // Ensure user is authenticated
+      if (!user) {
+        toast.error("Please log in to submit offers");
+        navigate("/login");
+        return;
+      }
+
       const { data: newOffer, error } = await supabase.from("offers").insert({
         company_name: formData.company_name,
         role_title: formData.role_title,
@@ -68,9 +177,14 @@ export default function Submit() {
         job_type: formData.job_type || null,
         level: formData.level || null,
         work_type: formData.work_type || null,
+        user_id: user.id,
+        user_email: user.email,
       }).select().single();
 
       if (error) throw error;
+
+      // Store submission time for rate limiting
+      localStorage.setItem("lastSubmissionTime", Date.now().toString());
 
       // Send verification email if provided
       if (verificationEmail.trim()) {
@@ -97,6 +211,17 @@ export default function Submit() {
     }
   };
 
+  if (isCheckingAuth) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navigation />
+        <main className="container mx-auto px-4 py-12 flex items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin" />
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
@@ -117,6 +242,8 @@ export default function Submit() {
                   <Input
                     id="company"
                     required
+                    minLength={2}
+                    maxLength={100}
                     value={formData.company_name}
                     onChange={(e) => setFormData({ ...formData, company_name: e.target.value })}
                     placeholder="e.g., Shopify"
@@ -128,6 +255,7 @@ export default function Submit() {
                   <Input
                     id="role"
                     required
+                    maxLength={100}
                     value={formData.role_title}
                     onChange={(e) => setFormData({ ...formData, role_title: e.target.value })}
                     placeholder="e.g., Software Engineer"
@@ -139,6 +267,7 @@ export default function Submit() {
                   <Input
                     id="location"
                     required
+                    maxLength={100}
                     value={formData.location}
                     onChange={(e) => setFormData({ ...formData, location: e.target.value })}
                     placeholder="e.g., Toronto, ON"
@@ -146,12 +275,14 @@ export default function Submit() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="salary">Hourly Rate *</Label>
+                  <Label htmlFor="salary">Hourly Rate * (Max $300/hr)</Label>
                   <div className="flex gap-2">
                     <Input
                       id="salary"
                       type="number"
                       step="0.01"
+                      min="10"
+                      max="300"
                       required
                       value={formData.salary_hourly}
                       onChange={(e) => setFormData({ ...formData, salary_hourly: e.target.value })}
@@ -279,13 +410,39 @@ export default function Submit() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="review">Review (Optional)</Label>
+                <Label htmlFor="review" className="flex items-center justify-between">
+                  <span>Review (Optional)</span>
+                  <span className="text-xs text-muted-foreground">
+                    {formData.review_text.trim() ? 
+                      `${formData.review_text.trim().split(/\s+/).length}/150 words` : 
+                      '150 words max'}
+                  </span>
+                </Label>
                 <Textarea
                   id="review"
                   value={formData.review_text}
                   onChange={(e) => setFormData({ ...formData, review_text: e.target.value })}
                   placeholder="Share your experience, what you learned, team culture, etc."
                   rows={4}
+                  maxLength={1000}
+                />
+                {formData.review_text.trim() && 
+                 formData.review_text.trim().split(/\s+/).length > 150 && (
+                  <p className="text-xs text-destructive">
+                    Review exceeds 150 word limit
+                  </p>
+                )}
+              </div>
+
+              {/* Honeypot field - hidden from users, catches bots */}
+              <div style={{ position: 'absolute', left: '-9999px' }} aria-hidden="true">
+                <Input
+                  type="text"
+                  name="website"
+                  value={honeypot}
+                  onChange={(e) => setHoneypot(e.target.value)}
+                  tabIndex={-1}
+                  autoComplete="off"
                 />
               </div>
 
