@@ -350,19 +350,7 @@ export default function Edit() {
                 
                 <div className="space-y-2">
                   <Label htmlFor="university">University (Optional)</Label>
-                  {isUniversityLocked ? (
-                    <div className="space-y-2">
-                      <Input
-                        id="university-locked"
-                        value={formData.university}
-                        disabled
-                        className="bg-muted cursor-not-allowed"
-                      />
-                      <p className="text-xs text-muted-foreground">
-                        🔒 Locked to your university based on your email address
-                      </p>
-                    </div>
-                  ) : customUniversityMode ? (
+                  {customUniversityMode ? (
                     <div className="space-y-2">
                       <Input
                         id="university-custom"
@@ -397,15 +385,23 @@ export default function Edit() {
                           <Command>
                             <CommandInput placeholder="Search university..." />
                             <CommandEmpty>No university found.</CommandEmpty>
+                            {isUniversityLocked && (
+                              <div className="px-2 py-3 text-xs text-muted-foreground border-b bg-muted/50">
+                                🔒 Your university is locked based on your email address. You can view the list but cannot change your selection.
+                              </div>
+                            )}
                             <CommandGroup className="max-h-64 overflow-auto">
                               {UNIVERSITIES.map((university) => (
                                 <CommandItem
                                   key={university}
                                   value={university}
                                   onSelect={(currentValue) => {
-                                    setFormData({ ...formData, university: currentValue === formData.university.toLowerCase() ? "" : university });
-                                    setUniversityOpen(false);
+                                    if (!isUniversityLocked) {
+                                      setFormData({ ...formData, university: currentValue === formData.university.toLowerCase() ? "" : university });
+                                      setUniversityOpen(false);
+                                    }
                                   }}
+                                  className={isUniversityLocked && university !== formData.university ? "opacity-50 cursor-not-allowed" : ""}
                                 >
                                   <Check
                                     className={cn(
@@ -414,22 +410,31 @@ export default function Edit() {
                                     )}
                                   />
                                   {university}
+                                  {isUniversityLocked && university === formData.university && (
+                                    <span className="ml-auto text-xs">🔒</span>
+                                  )}
                                 </CommandItem>
                               ))}
                             </CommandGroup>
                           </Command>
                         </PopoverContent>
                       </Popover>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setCustomUniversityMode(true);
-                          setFormData({ ...formData, university: "" });
-                        }}
-                        className="text-xs text-primary hover:underline"
-                      >
-                        Can't see your college?
-                      </button>
+                      <div className="text-xs text-muted-foreground">
+                        {isUniversityLocked ? (
+                          <span>🔒 Locked to your university</span>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setCustomUniversityMode(true);
+                              setFormData({ ...formData, university: "" });
+                            }}
+                            className="text-primary hover:underline"
+                          >
+                            Can't see your college?
+                          </button>
+                        )}
+                      </div>
                     </>
                   )}
                 </div>
