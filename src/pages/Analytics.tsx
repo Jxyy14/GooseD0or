@@ -119,7 +119,7 @@ export default function Analytics() {
           <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
             Analytics Dashboard
           </h1>
-          <p className="text-muted-foreground">Insights from {offers.length} co-op offers</p>
+          <p className="text-muted-foreground">Insights from {offers.length} internship offers from 350+ universities</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">

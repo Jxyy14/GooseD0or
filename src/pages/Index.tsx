@@ -43,7 +43,7 @@ export default function Index() {
           </div>
           
           <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
-            Discover Co-op Salaries
+            Discover Internship Salaries
             <br />
             <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent animate-pulse">
               Anonymous. Real. Verified.
@@ -51,8 +51,8 @@ export default function Index() {
           </h1>
           
           <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Join the Waterloo community sharing co-op offers, salaries, and experiences. 
-            Make informed decisions backed by real student data.
+            Born at UWaterloo 🪿, now serving students from 350+ universities.
+            Share internship offers, salaries, and experiences with students worldwide.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -151,7 +151,7 @@ export default function Index() {
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground">
-                Access real salary data, tech stacks, and ratings from fellow Waterloo students.
+                Access real salary data, tech stacks, and ratings from verified students.
               </p>
             </CardContent>
           </Card>
@@ -167,7 +167,7 @@ export default function Index() {
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground">
-                Built by students, for students. Help the community make informed co-op decisions.
+                Built by students, for students. Help the community make informed internship decisions.
               </p>
             </CardContent>
           </Card>
@@ -180,7 +180,7 @@ export default function Index() {
           <CardContent className="pt-12 pb-12 text-center">
             <h2 className="text-3xl font-bold mb-4">Ready to Get Started?</h2>
             <p className="text-muted-foreground mb-8 max-w-xl mx-auto">
-              Join hundreds of Waterloo students sharing their co-op experiences. 
+              Join students from 350+ universities sharing their internship experiences. 
               Your contribution helps everyone make better career decisions.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -199,10 +199,10 @@ export default function Index() {
       <footer className="border-t border-border py-8">
         <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
           <p className="mb-2">
-            GooseDoor is a student-run community platform for University of Waterloo co-op students.
+            Made with 🪿 at University of Waterloo • Serving 350+ universities worldwide
           </p>
           <p className="text-xs">
-            ⚠️ All data is user-submitted and unverified. Use at your own discretion. | LinkedIn: Jaffer Wehliye | Twitter: @wehliyejaffer
+            ⚠️ All data is user-submitted. Use at your own discretion. | LinkedIn: Jaffer Wehliye | Twitter: @wehliyejaffer
           </p>
         </div>
       </footer>

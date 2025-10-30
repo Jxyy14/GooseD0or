@@ -87,7 +87,7 @@ export default function HallOfShame() {
             <h1 className="text-4xl font-bold">Hall of Shame</h1>
           </div>
           <p className="text-muted-foreground max-w-2xl mx-auto mb-6">
-            Companies reported by students for unacceptable practices, broken promises, or toxic work environments.
+            Companies reported for unacceptable internship practices, broken promises, or toxic work environments.
             These entries are community-submitted and unverified.
           </p>
           

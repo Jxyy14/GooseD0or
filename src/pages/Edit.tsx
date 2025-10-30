@@ -233,7 +233,7 @@ export default function Edit() {
                 </Button>
               </Link>
             </div>
-            <CardTitle className="text-2xl">Edit Your Co-op Offer</CardTitle>
+            <CardTitle className="text-2xl">Edit Your Internship</CardTitle>
             <CardDescription>
               Update the details of your submission
             </CardDescription>

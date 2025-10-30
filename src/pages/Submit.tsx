@@ -248,7 +248,7 @@ export default function Submit() {
       <main className="container mx-auto px-4 py-12">
         <Card className="max-w-2xl mx-auto border-border shadow-lg">
           <CardHeader>
-            <CardTitle className="text-2xl">Submit Your Co-op Offer</CardTitle>
+            <CardTitle className="text-2xl">Submit Your Internship</CardTitle>
             <CardDescription>
               Share your experience anonymously to help fellow students
             </CardDescription>

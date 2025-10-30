@@ -129,7 +129,7 @@ export default function MySubmissions() {
             My Submissions
           </h1>
           <p className="text-muted-foreground">
-            Manage your submitted co-op offers
+            Manage your submitted internships
           </p>
         </div>
 

@@ -186,10 +186,10 @@ export default function Browse() {
       <main className="container mx-auto px-4 py-8">
         <div className="mb-8">
           <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-            Browse Co-op Offers
+            Browse Internships
           </h1>
           <p className="text-muted-foreground">
-            Explore {offers.length} anonymously submitted offers from Waterloo students
+            Explore {offers.length} anonymously submitted offers from students at 350+ universities
           </p>
         </div>
 
