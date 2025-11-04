@@ -93,16 +93,20 @@ export default function Analytics() {
 
   const COLORS = ["#FFC72C", "#FFD700", "#FFE44D", "#FFF066", "#FFED80", "#FFEB99", "#FFF2B2", "#FFF9CC"];
 
-  // Calculate separate averages for USD and CAD
-  const usdOffers = offers.filter(o => o.currency === 'USD');
-  const cadOffers = offers.filter(o => o.currency === 'CAD');
-  
-  const avgSalaryUSD = usdOffers.length > 0
-    ? (usdOffers.reduce((sum, o) => sum + o.salary_hourly, 0) / usdOffers.length).toFixed(2)
+  // Convert all salaries to USD (CAD * 0.73 = USD) and average
+  const avgSalaryUSD = offers.length > 0
+    ? (offers.reduce((sum, o) => {
+        const salaryInUSD = o.currency === 'CAD' ? o.salary_hourly * 0.73 : o.salary_hourly;
+        return sum + salaryInUSD;
+      }, 0) / offers.length).toFixed(2)
     : "0";
     
-  const avgSalaryCAD = cadOffers.length > 0
-    ? (cadOffers.reduce((sum, o) => sum + o.salary_hourly, 0) / cadOffers.length).toFixed(2)
+  // Convert all salaries to CAD (USD * 1.37 = CAD) and average
+  const avgSalaryCAD = offers.length > 0
+    ? (offers.reduce((sum, o) => {
+        const salaryInCAD = o.currency === 'USD' ? o.salary_hourly * 1.37 : o.salary_hourly;
+        return sum + salaryInCAD;
+      }, 0) / offers.length).toFixed(2)
     : "0";
 
   const avgRating = offers.length > 0

@@ -17,16 +17,20 @@ export default function Index() {
     const { data: offers } = await supabase.from("offers").select("*");
     
     if (offers) {
-      // Calculate separate averages for USD and CAD
-      const usdOffers = offers.filter((o: any) => o.currency === 'USD');
-      const cadOffers = offers.filter((o: any) => o.currency === 'CAD');
-      
-      const avgSalaryUSD = usdOffers.length > 0
-        ? usdOffers.reduce((sum, o: any) => sum + o.salary_hourly, 0) / usdOffers.length
+      // Convert all salaries to USD (CAD * 0.73 = USD)
+      const avgSalaryUSD = offers.length > 0
+        ? offers.reduce((sum, o: any) => {
+            const salaryInUSD = o.currency === 'CAD' ? o.salary_hourly * 0.73 : o.salary_hourly;
+            return sum + salaryInUSD;
+          }, 0) / offers.length
         : 0;
         
-      const avgSalaryCAD = cadOffers.length > 0
-        ? cadOffers.reduce((sum, o: any) => sum + o.salary_hourly, 0) / cadOffers.length
+      // Convert all salaries to CAD (USD * 1.37 = CAD)
+      const avgSalaryCAD = offers.length > 0
+        ? offers.reduce((sum, o: any) => {
+            const salaryInCAD = o.currency === 'USD' ? o.salary_hourly * 1.37 : o.salary_hourly;
+            return sum + salaryInCAD;
+          }, 0) / offers.length
         : 0;
         
       const uniqueCompanies = new Set(offers.map(o => o.company_name)).size;
