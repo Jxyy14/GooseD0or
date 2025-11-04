@@ -93,12 +93,16 @@ export default function Analytics() {
 
   const COLORS = ["#FFC72C", "#FFD700", "#FFE44D", "#FFF066", "#FFED80", "#FFEB99", "#FFF2B2", "#FFF9CC"];
 
-  // Convert all salaries to USD for fair comparison (CAD * 0.73 = USD)
-  const avgSalary = offers.length > 0
-    ? (offers.reduce((sum, o) => {
-        const salaryInUSD = o.currency === 'CAD' ? o.salary_hourly * 0.73 : o.salary_hourly;
-        return sum + salaryInUSD;
-      }, 0) / offers.length).toFixed(2)
+  // Calculate separate averages for USD and CAD
+  const usdOffers = offers.filter(o => o.currency === 'USD');
+  const cadOffers = offers.filter(o => o.currency === 'CAD');
+  
+  const avgSalaryUSD = usdOffers.length > 0
+    ? (usdOffers.reduce((sum, o) => sum + o.salary_hourly, 0) / usdOffers.length).toFixed(2)
+    : "0";
+    
+  const avgSalaryCAD = cadOffers.length > 0
+    ? (cadOffers.reduce((sum, o) => sum + o.salary_hourly, 0) / cadOffers.length).toFixed(2)
     : "0";
 
   const avgRating = offers.length > 0
@@ -145,8 +149,8 @@ export default function Analytics() {
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-primary">${avgSalary} USD</div>
-              <p className="text-xs text-muted-foreground mt-1">CAD converted to USD</p>
+              <div className="text-2xl font-bold text-primary">${avgSalaryUSD} (USD)</div>
+              <div className="text-2xl font-bold text-primary mt-1">${avgSalaryCAD} (CAD)</div>
             </CardContent>
           </Card>
 

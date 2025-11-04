@@ -17,11 +17,11 @@ export default function Index() {
     const { data: offers } = await supabase.from("offers").select("*");
     
     if (offers) {
-      // Convert CAD to USD for fair averaging (CAD * 0.73 = USD)
-      const avgSalary = offers.reduce((sum, o: any) => {
-        const salaryInUSD = o.currency === 'CAD' ? o.salary_hourly * 0.73 : o.salary_hourly;
-        return sum + salaryInUSD;
-      }, 0) / offers.length || 0;
+      // Calculate USD average only
+      const usdOffers = offers.filter((o: any) => o.currency === 'USD');
+      const avgSalary = usdOffers.length > 0
+        ? usdOffers.reduce((sum, o: any) => sum + o.salary_hourly, 0) / usdOffers.length
+        : 0;
       const uniqueCompanies = new Set(offers.map(o => o.company_name)).size;
       
       setStats({
@@ -90,7 +90,7 @@ export default function Index() {
           <Card className="border-border text-center">
             <CardHeader>
               <TrendingUp className="h-8 w-8 text-primary mx-auto mb-2" />
-              <CardTitle className="text-3xl font-bold text-primary">${stats.avgSalary}/hr USD</CardTitle>
+              <CardTitle className="text-3xl font-bold text-primary">${stats.avgSalary}/hr (USD)</CardTitle>
               <CardDescription>Average Hourly Rate</CardDescription>
             </CardHeader>
           </Card>
