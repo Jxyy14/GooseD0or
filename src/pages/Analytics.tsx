@@ -57,7 +57,7 @@ export default function Analytics() {
   // Calculate top paying companies (convert to USD for fair comparison)
   const topCompanies = offers
     .reduce((acc, offer) => {
-      const salaryInUSD = offer.currency === 'CAD' ? offer.salary_hourly * 0.73 : offer.salary_hourly;
+      const salaryInUSD = offer.currency === 'CAD' ? offer.salary_hourly * 0.71 : offer.salary_hourly;
       const existing = acc.find((c) => c.company === offer.company_name);
       if (existing) {
         existing.totalSalary += salaryInUSD;
@@ -93,18 +93,18 @@ export default function Analytics() {
 
   const COLORS = ["#FFC72C", "#FFD700", "#FFE44D", "#FFF066", "#FFED80", "#FFEB99", "#FFF2B2", "#FFF9CC"];
 
-  // Convert all salaries to USD (CAD * 0.73 = USD) and average
+  // Convert all salaries to USD (CAD * 0.71 = USD) and average
   const avgSalaryUSD = offers.length > 0
     ? (offers.reduce((sum, o) => {
-        const salaryInUSD = o.currency === 'CAD' ? o.salary_hourly * 0.73 : o.salary_hourly;
+        const salaryInUSD = o.currency === 'CAD' ? o.salary_hourly * 0.71 : o.salary_hourly;
         return sum + salaryInUSD;
       }, 0) / offers.length).toFixed(2)
     : "0";
     
-  // Convert all salaries to CAD (USD * 1.37 = CAD) and average
+  // Convert all salaries to CAD (USD * 1.41 = CAD) and average
   const avgSalaryCAD = offers.length > 0
     ? (offers.reduce((sum, o) => {
-        const salaryInCAD = o.currency === 'USD' ? o.salary_hourly * 1.37 : o.salary_hourly;
+        const salaryInCAD = o.currency === 'USD' ? o.salary_hourly * 1.41 : o.salary_hourly;
         return sum + salaryInCAD;
       }, 0) / offers.length).toFixed(2)
     : "0";

@@ -17,18 +17,18 @@ export default function Index() {
     const { data: offers } = await supabase.from("offers").select("*");
     
     if (offers) {
-      // Convert all salaries to USD (CAD * 0.73 = USD)
+      // Convert all salaries to USD (CAD * 0.71 = USD)
       const avgSalaryUSD = offers.length > 0
         ? offers.reduce((sum, o: any) => {
-            const salaryInUSD = o.currency === 'CAD' ? o.salary_hourly * 0.73 : o.salary_hourly;
+            const salaryInUSD = o.currency === 'CAD' ? o.salary_hourly * 0.71 : o.salary_hourly;
             return sum + salaryInUSD;
           }, 0) / offers.length
         : 0;
         
-      // Convert all salaries to CAD (USD * 1.37 = CAD)
+      // Convert all salaries to CAD (USD * 1.41 = CAD)
       const avgSalaryCAD = offers.length > 0
         ? offers.reduce((sum, o: any) => {
-            const salaryInCAD = o.currency === 'USD' ? o.salary_hourly * 1.37 : o.salary_hourly;
+            const salaryInCAD = o.currency === 'USD' ? o.salary_hourly * 1.41 : o.salary_hourly;
             return sum + salaryInCAD;
           }, 0) / offers.length
         : 0;
