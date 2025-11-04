@@ -11,6 +11,7 @@ type Offer = {
   tech_stack: string[];
   experience_rating: number;
   role_title: string;
+  currency: string;
 };
 
 const renderCustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, name, value }: any) => {
@@ -53,17 +54,18 @@ export default function Analytics() {
     }
   };
 
-  // Calculate top paying companies
+  // Calculate top paying companies (convert to USD for fair comparison)
   const topCompanies = offers
     .reduce((acc, offer) => {
+      const salaryInUSD = offer.currency === 'CAD' ? offer.salary_hourly * 0.73 : offer.salary_hourly;
       const existing = acc.find((c) => c.company === offer.company_name);
       if (existing) {
-        existing.totalSalary += offer.salary_hourly;
+        existing.totalSalary += salaryInUSD;
         existing.count += 1;
       } else {
         acc.push({
           company: offer.company_name,
-          totalSalary: offer.salary_hourly,
+          totalSalary: salaryInUSD,
           count: 1,
         });
       }
@@ -91,8 +93,12 @@ export default function Analytics() {
 
   const COLORS = ["#FFC72C", "#FFD700", "#FFE44D", "#FFF066", "#FFED80", "#FFEB99", "#FFF2B2", "#FFF9CC"];
 
+  // Convert all salaries to USD for fair comparison (CAD * 0.73 = USD)
   const avgSalary = offers.length > 0
-    ? (offers.reduce((sum, o) => sum + o.salary_hourly, 0) / offers.length).toFixed(2)
+    ? (offers.reduce((sum, o) => {
+        const salaryInUSD = o.currency === 'CAD' ? o.salary_hourly * 0.73 : o.salary_hourly;
+        return sum + salaryInUSD;
+      }, 0) / offers.length).toFixed(2)
     : "0";
 
   const avgRating = offers.length > 0
@@ -139,7 +145,8 @@ export default function Analytics() {
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-primary">${avgSalary}</div>
+              <div className="text-3xl font-bold text-primary">${avgSalary} USD</div>
+              <p className="text-xs text-muted-foreground mt-1">CAD converted to USD</p>
             </CardContent>
           </Card>
 
