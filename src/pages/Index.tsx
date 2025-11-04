@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Database, TrendingUp, Users, Sparkles, ArrowRight } from "lucide-react";
 
 export default function Index() {
-  const [stats, setStats] = useState({ totalOffers: 0, avgSalary: 0, companies: 0 });
+  const [stats, setStats] = useState({ totalOffers: 0, avgSalaryUSD: 0, avgSalaryCAD: 0, companies: 0 });
 
   useEffect(() => {
     fetchStats();
@@ -17,16 +17,24 @@ export default function Index() {
     const { data: offers } = await supabase.from("offers").select("*");
     
     if (offers) {
-      // Calculate USD average only
+      // Calculate separate averages for USD and CAD
       const usdOffers = offers.filter((o: any) => o.currency === 'USD');
-      const avgSalary = usdOffers.length > 0
+      const cadOffers = offers.filter((o: any) => o.currency === 'CAD');
+      
+      const avgSalaryUSD = usdOffers.length > 0
         ? usdOffers.reduce((sum, o: any) => sum + o.salary_hourly, 0) / usdOffers.length
         : 0;
+        
+      const avgSalaryCAD = cadOffers.length > 0
+        ? cadOffers.reduce((sum, o: any) => sum + o.salary_hourly, 0) / cadOffers.length
+        : 0;
+        
       const uniqueCompanies = new Set(offers.map(o => o.company_name)).size;
       
       setStats({
         totalOffers: offers.length,
-        avgSalary: parseFloat(avgSalary.toFixed(2)),
+        avgSalaryUSD: parseFloat(avgSalaryUSD.toFixed(2)),
+        avgSalaryCAD: parseFloat(avgSalaryCAD.toFixed(2)),
         companies: uniqueCompanies,
       });
     }
@@ -90,8 +98,9 @@ export default function Index() {
           <Card className="border-border text-center">
             <CardHeader>
               <TrendingUp className="h-8 w-8 text-primary mx-auto mb-2" />
-              <CardTitle className="text-3xl font-bold text-primary">${stats.avgSalary}/hr (USD)</CardTitle>
-              <CardDescription>Average Hourly Rate</CardDescription>
+              <CardTitle className="text-2xl font-bold text-primary">${stats.avgSalaryUSD}/hr (USD)</CardTitle>
+              <CardTitle className="text-2xl font-bold text-primary mt-1">${stats.avgSalaryCAD}/hr (CAD)</CardTitle>
+              <CardDescription className="mt-2">Average Hourly Rate</CardDescription>
             </CardHeader>
           </Card>
 
