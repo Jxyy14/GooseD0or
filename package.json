@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "Anonymous co-op salary database for University of Waterloo students",
+  "description": "Anonymous internship salary database serving 350+ universities worldwide",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
