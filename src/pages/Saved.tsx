@@ -3,7 +3,7 @@ import { Navigation } from "@/components/Navigation";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { MapPin, Calendar, Star, Bookmark, Trash2 } from "lucide-react";
-import { useBookmarks } from "@/hooks/useBookmarks";
+import { useBookmarks } from "@/contexts/BookmarkContext";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
@@ -30,22 +30,27 @@ export default function Saved() {
   const { bookmarks, removeBookmark } = useBookmarks();
 
   useEffect(() => {
+    console.log("Bookmarks changed:", bookmarks);
     fetchSavedOffers();
   }, [bookmarks]);
 
   const fetchSavedOffers = async () => {
+    console.log("fetchSavedOffers called, bookmarks:", bookmarks);
     if (bookmarks.length === 0) {
+      console.log("No bookmarks, returning early");
       setSavedOffers([]);
       setIsLoading(false);
       return;
     }
 
     try {
+      console.log("Fetching offers for IDs:", bookmarks);
       const { data, error } = await supabase
         .from("offers")
         .select("*")
         .in("id", bookmarks);
 
+      console.log("Supabase response:", { data, error });
       if (error) throw error;
       setSavedOffers(data || []);
     } catch (error) {

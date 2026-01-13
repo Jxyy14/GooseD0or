@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { MapPin, Search, Calendar, Filter, X, Star, Bookmark } from "lucide-react";
 import { toast } from "sonner";
-import { useBookmarks } from "@/hooks/useBookmarks";
+import { useBookmarks } from "@/contexts/BookmarkContext";
 
 type Offer = {
   id: string;

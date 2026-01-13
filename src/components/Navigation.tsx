@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useTheme } from "@/hooks/useTheme";
-import { useBookmarks } from "@/hooks/useBookmarks";
+import { useBookmarks } from "@/contexts/BookmarkContext";
 
 export function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
