@@ -107,12 +107,15 @@ export default function Signup() {
       });
 
       if (error) {
+        console.error("Signup error:", error);
         if (error.message.includes("User already registered")) {
           toast.error("This email is already registered. Try logging in instead.");
         } else if (error.message.includes("Only .edu")) {
           toast.error("Only .edu and university emails are allowed");
+        } else if (error.message.includes("email") || error.message.includes("Email")) {
+          toast.error("Email service error. Please try again later or contact support.");
         } else {
-          toast.error(error.message);
+          toast.error(error.message || "Signup failed. Please try again.");
         }
         return;
       }

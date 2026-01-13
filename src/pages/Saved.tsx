@@ -30,27 +30,22 @@ export default function Saved() {
   const { bookmarks, removeBookmark } = useBookmarks();
 
   useEffect(() => {
-    console.log("Bookmarks changed:", bookmarks);
     fetchSavedOffers();
   }, [bookmarks]);
 
   const fetchSavedOffers = async () => {
-    console.log("fetchSavedOffers called, bookmarks:", bookmarks);
     if (bookmarks.length === 0) {
-      console.log("No bookmarks, returning early");
       setSavedOffers([]);
       setIsLoading(false);
       return;
     }
 
     try {
-      console.log("Fetching offers for IDs:", bookmarks);
       const { data, error } = await supabase
         .from("offers")
         .select("*")
         .in("id", bookmarks);
 
-      console.log("Supabase response:", { data, error });
       if (error) throw error;
       setSavedOffers(data || []);
     } catch (error) {

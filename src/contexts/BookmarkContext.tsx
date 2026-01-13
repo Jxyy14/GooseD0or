@@ -45,13 +45,11 @@ export function BookmarkProvider({ children }: { children: ReactNode }) {
   };
 
   const toggleBookmark = (offerId: string) => {
-    console.log("toggleBookmark called with:", offerId);
     setBookmarks((prev) => {
-      const newBookmarks = prev.includes(offerId)
-        ? prev.filter((id) => id !== offerId)
-        : [...prev, offerId];
-      console.log("Bookmarks updated:", newBookmarks);
-      return newBookmarks;
+      if (prev.includes(offerId)) {
+        return prev.filter((id) => id !== offerId);
+      }
+      return [...prev, offerId];
     });
   };
 
