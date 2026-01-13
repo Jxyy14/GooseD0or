@@ -35,59 +35,6 @@ GooseDoor allows students to anonymously share and browse internship compensatio
 - **Charts**: Recharts
 - **Deployment**: Vercel/Netlify compatible
 
-## Getting Started
-
-### Prerequisites
-
-- Node.js 18+ 
-- npm or yarn
-- Supabase account
-
-### Installation
-
-1. Clone the repository:
-```bash
-git clone https://github.com/Jxyy14/GooseD0or.git
-cd GooseD0or
-```
-
-2. Install dependencies:
-```bash
-npm install
-```
-
-3. Set up environment variables:
-```bash
-cp .env.example .env
-```
-
-4. Add your Supabase credentials to `.env`:
-```
-VITE_SUPABASE_URL=https://your-project-id.supabase.co
-VITE_SUPABASE_ANON_KEY=your-anon-key-here
-```
-
-5. Start the development server:
-```bash
-npm run dev
-```
-
-6. Open http://localhost:5173 in your browser
-
-### Environment Variables
-
-| Variable | Description |
-|----------|-------------|
-| `VITE_SUPABASE_URL` | Your Supabase project URL |
-| `VITE_SUPABASE_ANON_KEY` | Your Supabase anonymous/public key |
-
-### Supabase Edge Functions (Optional)
-
-The following secrets should be set in your Supabase dashboard for edge functions:
-
-- `OPENAI_API_KEY` - For sentiment analysis and company summaries
-- `RESEND_API_KEY` - For sending verification emails
-
 ## Project Structure
 
 ```
@@ -137,15 +84,6 @@ src/
 | user_id | uuid | Foreign key to auth.users |
 | created_at | timestamp | Submission date |
 
-## Design System
-
-GooseDoor uses a bold typography-first design system with:
-
-- **Colors**: Near-black background (#0A0A0A) with UWaterloo gold accent (#FFC72C)
-- **Typography**: Inter for body, Inter Tight for headings, JetBrains Mono for data
-- **Borders**: Sharp edges (0px border radius) throughout
-- **Theme**: Supports both dark and light modes
-
 ## API Routes
 
 The application uses Supabase for all backend operations:
@@ -154,14 +92,6 @@ The application uses Supabase for all backend operations:
 - Database queries via Supabase client
 - Row Level Security (RLS) for data protection
 - Edge Functions for email verification and AI features
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/your-feature`)
-3. Commit your changes (`git commit -m 'Add your feature'`)
-4. Push to the branch (`git push origin feature/your-feature`)
-5. Open a Pull Request
 
 ## Security
 
