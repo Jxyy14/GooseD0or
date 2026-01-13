@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Navigation } from "@/components/Navigation";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
-import { TrendingUp, Building2, DollarSign, Award, Cpu } from "lucide-react";
+import { GraduationCap, Building2, DollarSign, Calendar } from "lucide-react";
 
 type Offer = {
   company_name: string;
@@ -12,6 +12,8 @@ type Offer = {
   experience_rating: number;
   role_title: string;
   currency: string;
+  university: string | null;
+  term: string;
 };
 
 const renderCustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, name, value }: any) => {
@@ -24,7 +26,7 @@ const renderCustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent
     <text 
       x={x} 
       y={y} 
-      fill="white" 
+      fill="hsl(var(--foreground))" 
       textAnchor={x > cx ? 'start' : 'end'} 
       dominantBaseline="central"
       style={{ fontFamily: "'Inter', sans-serif", fontSize: '14px', fontWeight: '500' }}
@@ -54,42 +56,33 @@ export default function Analytics() {
     }
   };
 
-  // Calculate top paying companies (convert to USD for fair comparison)
-  const topCompanies = offers
+  // Calculate top universities by offer count
+  const topUniversities = offers
+    .filter(offer => offer.university)
     .reduce((acc, offer) => {
-      const salaryInUSD = offer.currency === 'CAD' ? offer.salary_hourly * 0.71 : offer.salary_hourly;
-      const existing = acc.find((c) => c.company === offer.company_name);
+      const uni = offer.university!;
+      const existing = acc.find((u) => u.university === uni);
       if (existing) {
-        existing.totalSalary += salaryInUSD;
         existing.count += 1;
       } else {
-        acc.push({
-          company: offer.company_name,
-          totalSalary: salaryInUSD,
-          count: 1,
-        });
+        acc.push({ university: uni, count: 1 });
       }
       return acc;
-    }, [] as { company: string; totalSalary: number; count: number }[])
-    .map((c) => ({
-      company: c.company,
-      avgSalary: parseFloat((c.totalSalary / c.count).toFixed(2)),
-    }))
-    .sort((a, b) => b.avgSalary - a.avgSalary)
+    }, [] as { university: string; count: number }[])
+    .sort((a, b) => b.count - a.count)
     .slice(0, 10);
 
-  // Calculate tech stack popularity
-  const techStackData = offers
-    .flatMap((offer) => offer.tech_stack)
-    .reduce((acc, tech) => {
-      acc[tech] = (acc[tech] || 0) + 1;
+  // Calculate offers by term
+  const termData = offers
+    .reduce((acc, offer) => {
+      const term = offer.term || 'Unknown';
+      acc[term] = (acc[term] || 0) + 1;
       return acc;
     }, {} as Record<string, number>);
 
-  const topTechStacks = Object.entries(techStackData)
-    .map(([tech, count]) => ({ tech, count }))
-    .sort((a, b) => b.count - a.count)
-    .slice(0, 8);
+  const offersByTerm = Object.entries(termData)
+    .map(([term, count]) => ({ term, count }))
+    .sort((a, b) => b.count - a.count);
 
   const COLORS = ["#FFC72C", "#FFD700", "#FFE44D", "#FFF066", "#FFED80", "#FFEB99", "#FFF2B2", "#FFF9CC"];
 
@@ -109,9 +102,11 @@ export default function Analytics() {
       }, 0) / offers.length).toFixed(2)
     : "0";
 
-  const avgRating = offers.length > 0
-    ? (offers.reduce((sum, o) => sum + o.experience_rating, 0) / offers.length).toFixed(1)
-    : "0";
+  // Count unique universities
+  const uniqueUniversities = useMemo(() => {
+    const unis = new Set(offers.map(o => o.university).filter(Boolean));
+    return unis.size;
+  }, [offers]);
 
   if (isLoading) {
     return (
@@ -133,17 +128,17 @@ export default function Analytics() {
           <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
             Analytics Dashboard
           </h1>
-          <p className="text-muted-foreground">Insights from {offers.length} internship offers from 350+ universities</p>
+          <p className="text-muted-foreground">Insights from {offers.length} internship offers from {uniqueUniversities} universities</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           <Card className="border-border">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium">Total Offers</CardTitle>
               <Building2 className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-primary">{offers.length}</div>
+              <div className="text-4xl font-bold text-primary font-mono tracking-tight">{offers.length}</div>
             </CardContent>
           </Card>
 
@@ -153,18 +148,8 @@ export default function Analytics() {
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-primary">${avgSalaryUSD} (USD)</div>
-              <div className="text-2xl font-bold text-primary mt-1">${avgSalaryCAD} (CAD)</div>
-            </CardContent>
-          </Card>
-
-          <Card className="border-border">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Avg Rating</CardTitle>
-              <Award className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-primary">{avgRating}/5</div>
+              <div className="text-3xl font-bold text-primary font-mono tracking-tight">${avgSalaryUSD}<span className="text-lg text-muted-foreground">/hr USD</span></div>
+              <div className="text-3xl font-bold text-primary font-mono tracking-tight mt-1">${avgSalaryCAD}<span className="text-lg text-muted-foreground">/hr CAD</span></div>
             </CardContent>
           </Card>
         </div>
@@ -173,25 +158,25 @@ export default function Analytics() {
           <Card className="border-border">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <TrendingUp className="h-5 w-5 text-primary" />
-                Top Paying Companies
+                <GraduationCap className="h-5 w-5 text-primary" />
+                Top Universities
               </CardTitle>
-              <CardDescription>Average hourly rate by company</CardDescription>
+              <CardDescription>Most offers by university</CardDescription>
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={topCompanies}>
+                <BarChart data={topUniversities}>
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                  <XAxis dataKey="company" stroke="hsl(var(--muted-foreground))" />
+                  <XAxis dataKey="university" stroke="hsl(var(--muted-foreground))" tick={false} />
                   <YAxis stroke="hsl(var(--muted-foreground))" />
                   <Tooltip
                     contentStyle={{
                       backgroundColor: "hsl(var(--card))",
                       borderColor: "hsl(var(--border))",
-                      borderRadius: "8px",
+                      borderRadius: "0px",
                     }}
                   />
-                  <Bar dataKey="avgSalary" fill="hsl(var(--primary))" radius={[8, 8, 0, 0]} />
+                  <Bar dataKey="count" fill="hsl(var(--primary))" radius={0} />
                 </BarChart>
               </ResponsiveContainer>
             </CardContent>
@@ -200,25 +185,25 @@ export default function Analytics() {
           <Card className="border-border">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Cpu className="h-5 w-5 text-primary" />
-                Popular Tech Stacks
+                <Calendar className="h-5 w-5 text-primary" />
+                Offers by Term
               </CardTitle>
-              <CardDescription>Most commonly used technologies</CardDescription>
+              <CardDescription>Distribution across internship terms</CardDescription>
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={300}>
                 <PieChart>
                   <Pie
-                    data={topTechStacks}
+                    data={offersByTerm}
                     dataKey="count"
-                    nameKey="tech"
+                    nameKey="term"
                     cx="50%"
                     cy="50%"
                     outerRadius={100}
                     label={renderCustomLabel}
-                    labelLine={{stroke: 'rgba(255,255,255,0.5)', strokeWidth: 1}}
+                    labelLine={{stroke: 'hsl(var(--muted-foreground))', strokeWidth: 1}}
                   >
-                    {topTechStacks.map((_, index) => (
+                    {offersByTerm.map((_, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
@@ -226,8 +211,8 @@ export default function Analytics() {
                     contentStyle={{
                       backgroundColor: "hsl(var(--card))",
                       borderColor: "hsl(var(--border))",
-                      borderRadius: "8px",
-                      fontFamily: "'Inter', sans-serif",
+                      borderRadius: "0px",
+                      fontFamily: "monospace",
                       color: "#fff",
                     }}
                   />

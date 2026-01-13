@@ -1,5 +1,5 @@
 // Comprehensive list of North American and International universities
-// Over 350+ universities with email auto-detection
+// Universities with email auto-detection
 export const UNIVERSITIES = [
   // ============================================
   // CANADIAN UNIVERSITIES (~60)

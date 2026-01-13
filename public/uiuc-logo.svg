@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 78 100">
+  <!-- UIUC Block I - Wider/thicker version -->
+  <!-- Navy background/outline -->
+  <path d="M0 0 H78 V24 H52 V76 H78 V100 H0 V76 H26 V24 H0 Z" fill="#13294B"/>
+  <!-- Orange fill with rounded inner corners -->
+  <path d="M5 5 H73 V19 H47 Q42 19 42 24 V76 Q42 81 47 81 H73 V95 H5 V81 H31 Q36 81 36 76 V24 Q36 19 31 19 H5 Z" fill="#FF5F05"/>
+</svg>

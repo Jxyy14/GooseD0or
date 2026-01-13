@@ -2,76 +2,89 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
+/* 
+  Bold Typography Design System
+  =============================
+  Type-first design. Sharp edges. Amber accent on near-black.
+  Colors in HSL for Tailwind compatibility.
 */
 
 @layer base {
   :root {
-    --background: 0 0% 7%;
-    --foreground: 45 100% 95%;
-
-    --card: 0 0% 10%;
-    --card-foreground: 45 100% 95%;
-
-    --popover: 0 0% 10%;
-    --popover-foreground: 45 100% 95%;
-
-    --primary: 45 100% 60%;
-    --primary-foreground: 0 0% 7%;
-
-    --secondary: 0 0% 15%;
-    --secondary-foreground: 45 100% 95%;
-
-    --muted: 0 0% 15%;
-    --muted-foreground: 45 20% 65%;
-
-    --accent: 45 100% 50%;
-    --accent-foreground: 0 0% 7%;
-
+    /* Core palette - Light mode default */
+    --background: 0 0% 98%;
+    --foreground: 0 0% 4%;
+    --muted: 0 0% 94%;
+    --muted-foreground: 0 0% 40%;
+    --accent: 44 100% 45%;
+    --accent-foreground: 0 0% 98%;
+    --primary: 44 100% 45%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 0 0% 94%;
+    --secondary-foreground: 0 0% 4%;
     --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 95%;
-
-    --border: 0 0% 20%;
-    --input: 0 0% 20%;
-    --ring: 45 100% 60%;
-
-    --radius: 0.75rem;
-
-    --gradient-primary: linear-gradient(135deg, hsl(45 100% 60%), hsl(45 100% 50%));
-    --gradient-dark: linear-gradient(180deg, hsl(0 0% 7%), hsl(0 0% 10%));
-    --shadow-glow: 0 0 40px hsl(45 100% 50% / 0.3);
-    --shadow-card: 0 8px 32px hsl(0 0% 0% / 0.4);
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 85%;
+    --border-hover: 0 0% 70%;
+    --input: 0 0% 94%;
+    --ring: 38 92% 50%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 4%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 4%;
+    
+    /* Sharp edges - no radius */
+    --radius: 0px;
   }
 
+  /* Dark mode */
   .dark {
-    --background: 0 0% 7%;
-    --foreground: 45 100% 95%;
-
-    --card: 0 0% 10%;
-    --card-foreground: 45 100% 95%;
-
-    --popover: 0 0% 10%;
-    --popover-foreground: 45 100% 95%;
-
-    --primary: 45 100% 60%;
-    --primary-foreground: 0 0% 7%;
-
-    --secondary: 0 0% 15%;
-    --secondary-foreground: 45 100% 95%;
-
-    --muted: 0 0% 15%;
-    --muted-foreground: 45 20% 65%;
-
-    --accent: 45 100% 50%;
-    --accent-foreground: 0 0% 7%;
-
+    --background: 0 0% 4%;
+    --foreground: 0 0% 98%;
+    --muted: 0 0% 10%;
+    --muted-foreground: 0 0% 45%;
+    --accent: 44 100% 59%;
+    --accent-foreground: 0 0% 4%;
+    --primary: 44 100% 59%;
+    --primary-foreground: 0 0% 4%;
+    --secondary: 0 0% 10%;
+    --secondary-foreground: 0 0% 98%;
     --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 95%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 15%;
+    --border-hover: 0 0% 25%;
+    --input: 0 0% 10%;
+    --ring: 38 92% 50%;
+    --card: 0 0% 6%;
+    --card-foreground: 0 0% 98%;
+    --popover: 0 0% 6%;
+    --popover-foreground: 0 0% 98%;
+    --radius: 0px;
+  }
 
-    --border: 0 0% 20%;
-    --input: 0 0% 20%;
-    --ring: 45 100% 60%;
+  /* Light mode */
+  .light {
+    --background: 0 0% 98%;
+    --foreground: 0 0% 4%;
+    --muted: 0 0% 94%;
+    --muted-foreground: 0 0% 40%;
+    --accent: 44 100% 45%;
+    --accent-foreground: 0 0% 98%;
+    --primary: 44 100% 45%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 0 0% 94%;
+    --secondary-foreground: 0 0% 4%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 85%;
+    --border-hover: 0 0% 70%;
+    --input: 0 0% 94%;
+    --ring: 38 92% 50%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 4%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 4%;
+    --radius: 0px;
   }
 }
 
@@ -80,7 +93,172 @@ All colors MUST be HSL.
     @apply border-border;
   }
 
+  html {
+    /* Subtle noise grain texture overlay */
+    background-color: hsl(var(--background));
+  }
+
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
+    font-family: "Inter", system-ui, sans-serif;
+    font-feature-settings: "cv11", "ss01"; /* Alternate glyphs */
+    font-variation-settings: "opsz" 32;
+  }
+
+  /* Noise texture overlay on body */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.015;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  }
+
+  /* Typography defaults */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: "Inter Tight", "Inter", system-ui, sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    line-height: 1.1;
+  }
+
+  /* Display/quote typography */
+  .font-display {
+    font-family: "Playfair Display", Georgia, serif;
+  }
+
+  /* Mono for stats/labels */
+  .font-mono {
+    font-family: "JetBrains Mono", "Fira Code", monospace;
+  }
+}
+
+/* Custom utility classes for the Bold Typography system */
+@layer utilities {
+  /* Letter spacing */
+  .tracking-tighter {
+    letter-spacing: -0.06em;
+  }
+  .tracking-tight {
+    letter-spacing: -0.04em;
+  }
+  .tracking-normal {
+    letter-spacing: -0.01em;
+  }
+  .tracking-wide {
+    letter-spacing: 0.05em;
+  }
+  .tracking-wider {
+    letter-spacing: 0.1em;
+  }
+  .tracking-widest {
+    letter-spacing: 0.2em;
+  }
+
+  /* Text stroke effect for layered text */
+  .text-stroke {
+    -webkit-text-stroke: 1px hsl(var(--border));
+    color: transparent;
+  }
+
+  /* Animated underline base */
+  .underline-animated {
+    position: relative;
+  }
+  .underline-animated::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: hsl(var(--accent));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 150ms cubic-bezier(0.25, 0, 0, 1);
+  }
+  .underline-animated:hover::after {
+    transform: scaleX(1);
+  }
+
+  /* Marquee animation for university logos - seamless infinite scroll */
+  .marquee-container {
+    overflow: hidden;
+    width: 100%;
+  }
+  
+  .marquee-content {
+    display: flex;
+    width: max-content;
+    animation: scroll 35s linear infinite;
+  }
+  
+  @keyframes scroll {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
+  }
+
+  /* Aurora animation keyframes */
+  @keyframes aurora-1 {
+    0%, 100% {
+      transform: translate(0, 0) scale(1);
+    }
+    25% {
+      transform: translate(50px, -30px) scale(1.1);
+    }
+    50% {
+      transform: translate(20px, 40px) scale(0.9);
+    }
+    75% {
+      transform: translate(-40px, 20px) scale(1.05);
+    }
+  }
+
+  @keyframes aurora-2 {
+    0%, 100% {
+      transform: translate(0, 0) scale(1);
+    }
+    25% {
+      transform: translate(-60px, 40px) scale(1.15);
+    }
+    50% {
+      transform: translate(30px, -50px) scale(0.85);
+    }
+    75% {
+      transform: translate(50px, 30px) scale(1.1);
+    }
+  }
+
+  @keyframes aurora-3 {
+    0%, 100% {
+      transform: translate(0, 0) scale(1);
+    }
+    25% {
+      transform: translate(40px, 60px) scale(0.9);
+    }
+    50% {
+      transform: translate(-50px, -20px) scale(1.2);
+    }
+    75% {
+      transform: translate(-20px, 50px) scale(0.95);
+    }
+  }
+
+  .animate-aurora-1 {
+    animation: aurora-1 15s ease-in-out infinite;
+  }
+
+  .animate-aurora-2 {
+    animation: aurora-2 18s ease-in-out infinite;
+  }
+
+  .animate-aurora-3 {
+    animation: aurora-3 20s ease-in-out infinite;
   }
 }

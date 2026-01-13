@@ -1,22 +1,24 @@
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, LogOut, User, X } from "lucide-react";
+import { Menu, LogOut, X, Sun, Moon, Bookmark } from "lucide-react";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useTheme } from "@/hooks/useTheme";
+import { useBookmarks } from "@/hooks/useBookmarks";
 
 export function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
   const navigate = useNavigate();
+  const { theme, toggleTheme, isDark } = useTheme();
+  const { bookmarkCount } = useBookmarks();
 
   useEffect(() => {
-    // Get current user
     supabase.auth.getUser().then(({ data: { user } }) => {
       setUser(user);
     });
 
-    // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
     });
@@ -33,122 +35,123 @@ export function Navigation() {
   };
 
   return (
-    <nav className="bg-background border-b border-border sticky top-0 z-50 backdrop-blur-lg bg-opacity-90">
-      <div className="container mx-auto px-4">
+    <nav className="bg-background border-b border-border sticky top-0 z-50">
+      <div className="container mx-auto">
         <div className="flex h-16 items-center justify-between">
-          {/* Logo */}
-          <Link to="/" className="text-xl font-bold flex items-center gap-2">
-            <span className="text-2xl">🪿</span>
-            <span className="bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
-              GooseDoor
+          {/* Logo - Bold typographic treatment */}
+          <Link to="/" className="flex items-center group">
+            <span className="font-display text-2xl font-bold tracking-tight text-foreground group-hover:text-accent transition-colors duration-150">
+              GOOSEDOOR
             </span>
           </Link>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-2">
-            <Link to="/browse">
-              <Button variant="ghost">Browse Offers</Button>
+          {/* Desktop Navigation - Minimal links with underline hover */}
+          <nav className="hidden md:flex items-center gap-8">
+            <NavLink to="/browse">Browse</NavLink>
+            <NavLink to="/analytics">Analytics</NavLink>
+            <NavLink to="/cost-of-living">COL Adjustor</NavLink>
+            <NavLink to="/hall-of-shame">Hall of Shame</NavLink>
+            <Link
+              to="/saved"
+              className="relative text-sm font-semibold uppercase tracking-wider text-muted-foreground hover:text-accent transition-colors duration-150 group py-1 flex items-center gap-1"
+            >
+              <Bookmark className="h-4 w-4" strokeWidth={1.5} />
+              {bookmarkCount > 0 && (
+                <span className="text-xs text-accent">{bookmarkCount}</span>
+              )}
             </Link>
-            <Link to="/analytics">
-              <Button variant="ghost">Analytics</Button>
-            </Link>
-            <Link to="/hall-of-shame">
-              <Button variant="ghost">Hall of Shame</Button>
-            </Link>
+            <button
+              onClick={toggleTheme}
+              className="text-muted-foreground hover:text-accent transition-colors duration-150"
+              title={isDark ? "Switch to light mode" : "Switch to dark mode"}
+            >
+              {isDark ? <Sun className="h-4 w-4" strokeWidth={1.5} /> : <Moon className="h-4 w-4" strokeWidth={1.5} />}
+            </button>
           </nav>
 
-          {/* Desktop Auth Buttons */}
-          <div className="hidden md:flex items-center gap-2">
+          {/* Desktop Auth */}
+          <div className="hidden md:flex items-center gap-4">
             {user ? (
               <>
-                <Link to="/my-submissions">
-                  <Button variant="ghost">My Submissions</Button>
-                </Link>
+                <NavLink to="/my-submissions">My Submissions</NavLink>
                 <Link to="/submit">
-                  <Button>Submit Offer</Button>
+                  <Button size="sm">Submit</Button>
                 </Link>
-                <div className="flex items-center gap-2 px-3 py-1.5 bg-primary/10 rounded-lg border border-primary/20">
-                  <User className="h-4 w-4 text-primary" />
-                  <span className="text-sm font-medium">
-                    {user.email?.split('@')[0]}
-                  </span>
-                </div>
-                <Button variant="ghost" size="sm" onClick={handleLogout}>
-                  <LogOut className="h-4 w-4 mr-2" />
-                  Logout
-                </Button>
+                <div className="h-4 w-px bg-border" />
+                <span className="font-mono text-xs text-muted-foreground tracking-wide">
+                  {user.email?.split('@')[0]}
+                </span>
+                <button
+                  onClick={handleLogout}
+                  className="text-muted-foreground hover:text-accent transition-colors duration-150"
+                  title="Logout"
+                >
+                  <LogOut className="h-4 w-4" strokeWidth={1.5} />
+                </button>
               </>
             ) : (
               <>
-                <Link to="/login">
-                  <Button variant="ghost">Login</Button>
-                </Link>
+                <NavLink to="/login">Login</NavLink>
                 <Link to="/signup">
-                  <Button>Sign Up</Button>
+                  <Button variant="outline" size="sm">Sign Up</Button>
                 </Link>
               </>
             )}
           </div>
 
           {/* Mobile Menu Button */}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="md:hidden"
+          <button
+            className="md:hidden p-2 text-foreground hover:text-accent transition-colors duration-150"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
-            {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-          </Button>
+            {isMenuOpen ? <X className="h-6 w-6" strokeWidth={1.5} /> : <Menu className="h-6 w-6" strokeWidth={1.5} />}
+          </button>
         </div>
 
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="md:hidden py-4 space-y-2 border-t border-border">
-            <Link to="/browse" onClick={() => setIsMenuOpen(false)}>
-              <Button variant="ghost" className="w-full justify-start">
-                Browse Offers
-              </Button>
-            </Link>
-            <Link to="/analytics" onClick={() => setIsMenuOpen(false)}>
-              <Button variant="ghost" className="w-full justify-start">
-                Analytics
-              </Button>
-            </Link>
-            <Link to="/hall-of-shame" onClick={() => setIsMenuOpen(false)}>
-              <Button variant="ghost" className="w-full justify-start">
-                Hall of Shame
-              </Button>
-            </Link>
+          <div className="md:hidden py-6 border-t border-border">
+            <div className="flex flex-col gap-4">
+              <MobileNavLink to="/browse" onClick={() => setIsMenuOpen(false)}>Browse</MobileNavLink>
+              <MobileNavLink to="/analytics" onClick={() => setIsMenuOpen(false)}>Analytics</MobileNavLink>
+              <MobileNavLink to="/cost-of-living" onClick={() => setIsMenuOpen(false)}>COL Adjustor</MobileNavLink>
+              <MobileNavLink to="/hall-of-shame" onClick={() => setIsMenuOpen(false)}>Hall of Shame</MobileNavLink>
+              <MobileNavLink to="/saved" onClick={() => setIsMenuOpen(false)}>
+                Saved {bookmarkCount > 0 && `(${bookmarkCount})`}
+              </MobileNavLink>
+              
+              <button
+                onClick={toggleTheme}
+                className="flex items-center gap-2 text-lg font-semibold uppercase tracking-wider text-foreground hover:text-accent transition-colors duration-150"
+              >
+                {isDark ? <Sun className="h-5 w-5" strokeWidth={1.5} /> : <Moon className="h-5 w-5" strokeWidth={1.5} />}
+                {isDark ? "Light Mode" : "Dark Mode"}
+              </button>
+              
+              <div className="h-px bg-border my-2" />
 
-            <div className="pt-4 space-y-2 border-t border-border">
               {user ? (
                 <>
-                  <div className="px-3 py-2 bg-primary/10 rounded-lg text-sm border border-primary/20">
-                    <User className="h-4 w-4 inline mr-2 text-primary" />
-                    <span className="font-medium">{user.email}</span>
+                  <div className="font-mono text-xs text-muted-foreground tracking-wide px-1">
+                    {user.email}
                   </div>
-                  <Link to="/my-submissions" onClick={() => setIsMenuOpen(false)}>
-                    <Button variant="outline" className="w-full">My Submissions</Button>
-                  </Link>
+                  <MobileNavLink to="/my-submissions" onClick={() => setIsMenuOpen(false)}>My Submissions</MobileNavLink>
                   <Link to="/submit" onClick={() => setIsMenuOpen(false)}>
-                    <Button className="w-full">Submit Offer</Button>
+                    <Button className="w-full" size="sm">Submit Offer</Button>
                   </Link>
-                  <Button 
-                    variant="outline" 
-                    className="w-full" 
+                  <button
                     onClick={handleLogout}
+                    className="flex items-center gap-2 text-sm text-muted-foreground hover:text-accent transition-colors duration-150 uppercase tracking-wider font-semibold"
                   >
-                    <LogOut className="h-4 w-4 mr-2" />
+                    <LogOut className="h-4 w-4" strokeWidth={1.5} />
                     Logout
-                  </Button>
+                  </button>
                 </>
               ) : (
                 <>
-                  <Link to="/login" onClick={() => setIsMenuOpen(false)}>
-                    <Button variant="outline" className="w-full">Login</Button>
-                  </Link>
+                  <MobileNavLink to="/login" onClick={() => setIsMenuOpen(false)}>Login</MobileNavLink>
                   <Link to="/signup" onClick={() => setIsMenuOpen(false)}>
-                    <Button className="w-full">Sign Up</Button>
+                    <Button variant="outline" className="w-full" size="sm">Sign Up</Button>
                   </Link>
                 </>
               )}
@@ -157,5 +160,31 @@ export function Navigation() {
         )}
       </div>
     </nav>
+  );
+}
+
+// Desktop nav link with animated underline
+function NavLink({ to, children }: { to: string; children: React.ReactNode }) {
+  return (
+    <Link
+      to={to}
+      className="relative text-sm font-semibold uppercase tracking-wider text-muted-foreground hover:text-accent transition-colors duration-150 group py-1"
+    >
+      {children}
+      <span className="absolute bottom-0 left-0 h-0.5 w-full bg-accent origin-left transform scale-x-0 transition-transform duration-150 ease-bold group-hover:scale-x-100" />
+    </Link>
+  );
+}
+
+// Mobile nav link
+function MobileNavLink({ to, onClick, children }: { to: string; onClick: () => void; children: React.ReactNode }) {
+  return (
+    <Link
+      to={to}
+      onClick={onClick}
+      className="text-lg font-semibold uppercase tracking-wider text-foreground hover:text-accent transition-colors duration-150"
+    >
+      {children}
+    </Link>
   );
 }

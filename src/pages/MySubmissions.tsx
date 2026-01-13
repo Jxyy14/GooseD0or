@@ -4,8 +4,7 @@ import { Navigation } from "@/components/Navigation";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Building2, MapPin, DollarSign, Star, Calendar, Edit, Trash2, Loader2 } from "lucide-react";
+import { MapPin, Star, Calendar, Edit, Trash2, Loader2, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 import {
   AlertDialog,
@@ -123,139 +122,164 @@ export default function MySubmissions() {
     <div className="min-h-screen bg-background">
       <Navigation />
 
-      <main className="container mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+      <main className="container mx-auto py-12 md:py-20">
+        {/* Header */}
+        <div className="mb-12">
+          <span className="font-mono text-xs tracking-widest text-accent uppercase block mb-4">
+            {offers.length} submission{offers.length !== 1 ? 's' : ''}
+          </span>
+          <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground mb-4">
             My Submissions
           </h1>
-          <p className="text-muted-foreground">
-            Manage your submitted internships
+          <p className="text-lg text-muted-foreground">
+            Manage your submitted internship offers
           </p>
         </div>
 
         {isLoading ? (
-          <div className="text-center py-12">
-            <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" />
-            <p className="text-muted-foreground mt-4">Loading your submissions...</p>
+          <div className="text-center py-20">
+            <Loader2 className="h-8 w-8 animate-spin mx-auto text-accent" strokeWidth={1.5} />
+            <p className="text-muted-foreground mt-4 font-mono text-sm">Loading your submissions...</p>
           </div>
         ) : offers.length === 0 ? (
-          <Card className="border-dashed">
-            <CardContent className="pt-12 pb-12 text-center">
-              <p className="text-muted-foreground mb-4">
-                You haven't submitted any offers yet.
-              </p>
-              <Button onClick={() => navigate("/submit")}>
-                Submit Your First Offer
-              </Button>
-            </CardContent>
-          </Card>
+          <div className="border border-dashed border-border p-12 md:p-20 text-center">
+            <p className="text-muted-foreground mb-6 text-lg">
+              You haven't submitted any offers yet.
+            </p>
+            <Button onClick={() => navigate("/submit")} size="lg">
+              Submit Your First Offer
+              <ArrowRight className="ml-2 h-4 w-4" strokeWidth={1.5} />
+            </Button>
+          </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-border">
             {offers.map((offer) => (
-              <Card key={offer.id} className="border-border hover:border-primary/50 transition-all">
-                <CardContent className="pt-6">
-                  <div className="space-y-4">
-                    <div>
-                      <h3 className="font-bold text-lg flex items-center gap-2">
-                        <Building2 className="h-5 w-5 text-primary" />
+              <Card key={offer.id} className="bg-background border-0 hover:bg-muted/50 transition-colors duration-150">
+                <CardContent className="p-6 md:p-8 space-y-4">
+                  {/* Company & Role */}
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <h3 className="font-display text-xl font-bold tracking-tight text-foreground">
                         {offer.company_name}
-                        {offer.verified_uwaterloo && (
-                          <span 
-                            className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-yellow-500/10 text-yellow-600 border border-yellow-500/20" 
-                            title="Verified UWaterloo student"
-                          >
-                            🪿 UW
-                          </span>
-                        )}
                       </h3>
-                      <p className="text-foreground/80">{offer.role_title}</p>
-                      {offer.university && (
-                        <p className="text-xs text-muted-foreground mt-0.5">
-                          {offer.university}
-                        </p>
-                      )}
-                      <div className="flex gap-2 mt-1 flex-wrap">
-                        {offer.job_type && <Badge variant="outline" className="text-xs">{offer.job_type}</Badge>}
-                        {offer.level && <Badge variant="outline" className="text-xs">{offer.level}</Badge>}
-                        {offer.work_type && <Badge variant="outline" className="text-xs">{offer.work_type}</Badge>}
-                      </div>
-                      {(offer.program || offer.year_of_study) && (
-                        <p className="text-sm text-muted-foreground mt-1">
-                          {offer.program && offer.year_of_study 
-                            ? `${offer.program} • ${offer.year_of_study}`
-                            : offer.program || offer.year_of_study}
-                        </p>
+                      {offer.verified_uwaterloo && (
+                        <span 
+                          className="font-mono text-[10px] tracking-wider px-1.5 py-0.5 bg-accent/10 text-accent border border-accent/20" 
+                          title="Verified UWaterloo student"
+                        >
+                          🪿 UW
+                        </span>
                       )}
                     </div>
-
-                    <div className="space-y-2 text-sm">
-                      <div className="flex items-center gap-2 text-muted-foreground">
-                        <MapPin className="h-4 w-4" />
-                        {offer.location}
-                      </div>
-                      <div className="flex items-center gap-2 text-muted-foreground">
-                        <Calendar className="h-4 w-4" />
-                        {offer.term}
-                      </div>
-                      <div className="flex items-center gap-2 font-semibold text-primary">
-                        <DollarSign className="h-4 w-4" />
-                        ${offer.salary_hourly}/hr <span className="text-xs text-muted-foreground">({offer.currency || 'CAD'})</span>
-                      </div>
-                      {offer.experience_rating && (
-                        <div className="flex items-center gap-2">
-                          <Star className="h-4 w-4 fill-primary text-primary" />
-                          <span>{offer.experience_rating}/5</span>
-                        </div>
-                      )}
-                    </div>
-
-                    {offer.tech_stack.length > 0 && (
-                      <div className="flex flex-wrap gap-2">
-                        {offer.tech_stack.map((tech) => (
-                          <Badge key={tech} variant="secondary" className="text-xs">
-                            {tech}
-                          </Badge>
-                        ))}
-                      </div>
+                    <p className="text-foreground/80">{offer.role_title}</p>
+                    {offer.university && (
+                      <p className="text-xs text-muted-foreground mt-1">{offer.university}</p>
                     )}
+                  </div>
 
-                    {offer.review_text && (
-                      <p className="text-sm text-muted-foreground line-clamp-2 italic border-l-2 border-primary pl-3">
-                        "{offer.review_text}"
-                      </p>
+                  {/* Tags */}
+                  <div className="flex flex-wrap gap-2">
+                    {offer.job_type && (
+                      <span className="font-mono text-xs tracking-wide text-muted-foreground border border-border px-2 py-0.5">
+                        {offer.job_type}
+                      </span>
                     )}
+                    {offer.level && (
+                      <span className="font-mono text-xs tracking-wide text-muted-foreground border border-border px-2 py-0.5">
+                        {offer.level}
+                      </span>
+                    )}
+                    {offer.work_type && (
+                      <span className="font-mono text-xs tracking-wide text-muted-foreground border border-border px-2 py-0.5">
+                        {offer.work_type}
+                      </span>
+                    )}
+                  </div>
 
-                    <div className="text-xs text-muted-foreground pt-2 border-t">
-                      Submitted on {formatDate(offer.created_at)}
+                  {/* Details */}
+                  <div className="space-y-2 text-sm">
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                      <MapPin className="h-4 w-4" strokeWidth={1.5} />
+                      {offer.location}
                     </div>
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                      <Calendar className="h-4 w-4" strokeWidth={1.5} />
+                      {offer.term}
+                    </div>
+                  </div>
 
-                    <div className="flex gap-2 pt-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="flex-1"
-                        onClick={() => handleEdit(offer.id)}
-                      >
-                        <Edit className="h-4 w-4 mr-2" />
-                        Edit
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="flex-1 text-destructive hover:bg-destructive/10"
-                        onClick={() => handleDeleteClick(offer)}
-                        disabled={deletingId === offer.id}
-                      >
-                        {deletingId === offer.id ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                        ) : (
-                          <>
-                            <Trash2 className="h-4 w-4 mr-2" />
-                            Delete
-                          </>
-                        )}
-                      </Button>
+                  {/* Salary */}
+                  <div className="pt-2 border-t border-border">
+                    <div className="font-mono text-2xl font-bold tracking-tight text-accent">
+                      ${offer.salary_hourly}
+                      <span className="text-sm text-muted-foreground font-normal">/hr {offer.currency || 'CAD'}</span>
                     </div>
+                  </div>
+
+                  {/* Rating */}
+                  {offer.experience_rating && (
+                    <div className="flex items-center gap-1">
+                      {[...Array(5)].map((_, i) => (
+                        <Star 
+                          key={i} 
+                          className={`h-4 w-4 ${i < offer.experience_rating! ? 'fill-accent text-accent' : 'text-border'}`} 
+                          strokeWidth={1.5}
+                        />
+                      ))}
+                      <span className="text-sm text-muted-foreground ml-1">{offer.experience_rating}/5</span>
+                    </div>
+                  )}
+
+                  {/* Tech Stack */}
+                  {offer.tech_stack.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5">
+                      {offer.tech_stack.map((tech) => (
+                        <span key={tech} className="font-mono text-xs text-muted-foreground bg-muted px-2 py-0.5">
+                          {tech}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Review */}
+                  {offer.review_text && (
+                    <p className="text-sm text-muted-foreground italic border-l-2 border-accent pl-3 leading-relaxed line-clamp-2">
+                      "{offer.review_text}"
+                    </p>
+                  )}
+
+                  {/* Metadata */}
+                  <div className="font-mono text-xs text-muted-foreground pt-2 border-t border-border">
+                    Submitted {formatDate(offer.created_at)}
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex gap-2 pt-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="flex-1"
+                      onClick={() => handleEdit(offer.id)}
+                    >
+                      <Edit className="h-4 w-4 mr-2" strokeWidth={1.5} />
+                      Edit
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="flex-1 text-destructive hover:bg-destructive hover:text-destructive-foreground hover:border-destructive"
+                      onClick={() => handleDeleteClick(offer)}
+                      disabled={deletingId === offer.id}
+                    >
+                      {deletingId === offer.id ? (
+                        <Loader2 className="h-4 w-4 animate-spin" strokeWidth={1.5} />
+                      ) : (
+                        <>
+                          <Trash2 className="h-4 w-4 mr-2" strokeWidth={1.5} />
+                          Delete
+                        </>
+                      )}
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
@@ -266,20 +290,22 @@ export default function MySubmissions() {
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={!!offerToDelete} onOpenChange={() => setOfferToDelete(null)}>
-        <AlertDialogContent>
+        <AlertDialogContent className="border-border bg-card">
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Submission?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to delete your submission for <strong>{offerToDelete?.company_name}</strong> - {offerToDelete?.role_title}?
+            <AlertDialogTitle className="font-display text-xl font-bold tracking-tight">
+              Delete Submission?
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-muted-foreground">
+              Are you sure you want to delete your submission for <strong className="text-foreground">{offerToDelete?.company_name}</strong> - {offerToDelete?.role_title}?
               <br /><br />
               This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel className="border-border">Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDeleteConfirm}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90 border-0"
             >
               Delete
             </AlertDialogAction>
@@ -289,4 +315,3 @@ export default function MySubmissions() {
     </div>
   );
 }
-

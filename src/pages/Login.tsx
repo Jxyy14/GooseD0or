@@ -4,11 +4,9 @@ import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Loader2, GraduationCap, AlertCircle } from "lucide-react";
+import { Loader2, AlertCircle, ArrowRight } from "lucide-react";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -72,98 +70,111 @@ export default function Login() {
     <div className="min-h-screen bg-background">
       <Navigation />
       
-      <main className="container mx-auto px-4 py-12 flex items-center justify-center">
-        <Card className="w-full max-w-md border-border shadow-lg">
-          <CardHeader className="space-y-1 text-center">
-            <div className="flex justify-center mb-4">
-              <div className="p-3 bg-primary/10 rounded-full">
-                <GraduationCap className="h-8 w-8 text-primary" />
-              </div>
+      <main className="container mx-auto py-20 md:py-28">
+        <div className="max-w-md mx-auto">
+          {/* Header */}
+          <div className="mb-10">
+            <span className="font-mono text-xs tracking-widest text-accent uppercase block mb-4">
+              Welcome back
+            </span>
+            <h1 className="font-display text-4xl md:text-5xl font-bold tracking-tight text-foreground mb-4">
+              Sign in
+            </h1>
+            <p className="text-muted-foreground">
+              Use your university email to access GooseDoor
+            </p>
+          </div>
+
+          {/* Form */}
+          <form onSubmit={handleLogin} className="space-y-6">
+            <div className="space-y-2">
+              <Label htmlFor="email" className="font-mono text-xs tracking-widest uppercase text-muted-foreground">
+                University Email
+              </Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="yourname@uwaterloo.ca"
+                value={email}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  if (emailError) validateEmail(e.target.value);
+                }}
+                onBlur={() => validateEmail(email)}
+                required
+                autoComplete="email"
+                className="h-14"
+              />
+              {emailError && (
+                <p className="text-sm text-destructive flex items-center gap-2">
+                  <AlertCircle className="h-4 w-4" strokeWidth={1.5} />
+                  {emailError}
+                </p>
+              )}
             </div>
-            <CardTitle className="text-2xl">Welcome Back</CardTitle>
-            <CardDescription>
-              Sign in with your university email
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleLogin} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email">University Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="yourname@uwaterloo.ca"
-                  value={email}
-                  onChange={(e) => {
-                    setEmail(e.target.value);
-                    if (emailError) validateEmail(e.target.value);
-                  }}
-                  onBlur={() => validateEmail(email)}
-                  required
-                  autoComplete="email"
-                />
-                {emailError && (
-                  <p className="text-sm text-destructive flex items-center gap-1">
-                    <AlertCircle className="h-3 w-3" />
-                    {emailError}
-                  </p>
-                )}
+
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="password" className="font-mono text-xs tracking-widest uppercase text-muted-foreground">
+                  Password
+                </Label>
+                <Link 
+                  to="/reset-password" 
+                  className="font-mono text-xs tracking-wide text-muted-foreground hover:text-accent transition-colors duration-150"
+                >
+                  Forgot password?
+                </Link>
               </div>
+              <Input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                autoComplete="current-password"
+                className="h-14"
+              />
+            </div>
 
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="password">Password</Label>
-                  <Link 
-                    to="/reset-password" 
-                    className="text-xs text-muted-foreground hover:text-primary"
-                  >
-                    Forgot password?
-                  </Link>
-                </div>
-                <Input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  autoComplete="current-password"
-                />
-              </div>
+            {/* Info box */}
+            <div className="border border-border p-4 text-sm text-muted-foreground">
+              <p className="flex items-start gap-2">
+                <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" strokeWidth={1.5} />
+                Only .edu and university emails can access GooseDoor
+              </p>
+            </div>
 
-              <Alert>
-                <AlertCircle className="h-4 w-4" />
-                <AlertDescription className="text-sm">
-                  Only .edu and @uwaterloo.ca emails can access GooseDoor
-                </AlertDescription>
-              </Alert>
+            <Button
+              type="submit"
+              className="w-full"
+              size="lg"
+              disabled={isLoading || !!emailError}
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Signing in...
+                </>
+              ) : (
+                <>
+                  Sign In
+                  <ArrowRight className="ml-2 h-4 w-4" strokeWidth={1.5} />
+                </>
+              )}
+            </Button>
+          </form>
 
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={isLoading || !!emailError}
-              >
-                {isLoading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Signing in...
-                  </>
-                ) : (
-                  "Sign In"
-                )}
-              </Button>
-            </form>
-          </CardContent>
-          <CardFooter className="flex flex-col space-y-2">
-            <div className="text-sm text-muted-foreground text-center">
+          {/* Footer */}
+          <div className="mt-8 pt-8 border-t border-border text-center">
+            <p className="text-sm text-muted-foreground">
               Don't have an account?{" "}
-              <Link to="/signup" className="text-primary hover:underline font-medium">
+              <Link to="/signup" className="text-accent hover:underline font-semibold">
                 Sign up
               </Link>
-            </div>
-          </CardFooter>
-        </Card>
+            </p>
+          </div>
+        </div>
       </main>
     </div>
   );
 }
-

@@ -13,6 +13,8 @@ import HallOfShame from "./pages/HallOfShame";
 import Verify from "./pages/Verify";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import Saved from "./pages/Saved";
+import CostOfLiving from "./pages/CostOfLiving";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -34,6 +36,8 @@ const App = () => (
           <Route path="/verify/:token" element={<Verify />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/saved" element={<Saved />} />
+          <Route path="/cost-of-living" element={<CostOfLiving />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

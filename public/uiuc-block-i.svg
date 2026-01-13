@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 65 80" fill="none">
+  <!-- UIUC Block I - No background, just the I shape -->
+  <!-- Navy outline of I shape -->
+  <path d="M0 0 H65 V20 H47 V60 H65 V80 H0 V60 H18 V20 H0 Z" fill="#13294B"/>
+  <!-- Orange fill of I shape -->
+  <path d="M4 4 H61 V16 H43 V64 H61 V76 H4 V64 H22 V16 H4 Z" fill="#FF5F05"/>
+</svg>

@@ -4,11 +4,9 @@ import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Loader2, GraduationCap, CheckCircle2, AlertCircle } from "lucide-react";
+import { Loader2, CheckCircle2, AlertCircle, ArrowRight } from "lucide-react";
 
 export default function Signup() {
   const navigate = useNavigate();
@@ -26,7 +24,6 @@ export default function Signup() {
       return false;
     }
     
-    // Basic email format validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       setEmailError("Please enter a valid email address");
@@ -35,7 +32,6 @@ export default function Signup() {
     
     const emailLower = email.toLowerCase();
     
-    // Check for academic email domains
     const isUSEdu = emailLower.endsWith('.edu');
     const isAustraliaEdu = emailLower.endsWith('.edu.au');
     const isCanadaEdu = emailLower.endsWith('.ca');
@@ -48,7 +44,6 @@ export default function Signup() {
       return false;
     }
     
-    // Check for common typos in domains
     const domain = emailLower.split('@')[1];
     const commonTypos = ['gmial.com', 'gmai.com', 'yahooo.com', 'hotmial.com'];
     if (commonTypos.includes(domain)) {
@@ -84,7 +79,7 @@ export default function Signup() {
     e.preventDefault();
     
     if (!validateEmail(email)) {
-      toast.error("Please use a valid .edu or @uwaterloo.ca email");
+      toast.error("Please use a valid .edu or university email");
       return;
     }
     
@@ -115,7 +110,7 @@ export default function Signup() {
         if (error.message.includes("User already registered")) {
           toast.error("This email is already registered. Try logging in instead.");
         } else if (error.message.includes("Only .edu")) {
-          toast.error("Only .edu and @uwaterloo.ca emails are allowed");
+          toast.error("Only .edu and university emails are allowed");
         } else {
           toast.error(error.message);
         }
@@ -134,7 +129,6 @@ export default function Signup() {
     }
   };
 
-  // Check email validity without triggering state updates
   const isEmailValid = email && (email.toLowerCase().endsWith('.edu') || email.toLowerCase().endsWith('@uwaterloo.ca')) && !emailError;
   const isPasswordValid = password && password.length >= 8 && !passwordError;
 
@@ -142,140 +136,158 @@ export default function Signup() {
     <div className="min-h-screen bg-background">
       <Navigation />
       
-      <main className="container mx-auto px-4 py-12 flex items-center justify-center">
-        <Card className="w-full max-w-md border-border shadow-lg">
-          <CardHeader className="space-y-1 text-center">
-            <div className="flex justify-center mb-4">
-              <div className="p-3 bg-primary/10 rounded-full">
-                <GraduationCap className="h-8 w-8 text-primary" />
-              </div>
+      <main className="container mx-auto py-20 md:py-28">
+        <div className="max-w-md mx-auto">
+          {/* Header */}
+          <div className="mb-10">
+            <span className="font-mono text-xs tracking-widest text-accent uppercase block mb-4">
+              Join the community
+            </span>
+            <h1 className="font-display text-4xl md:text-5xl font-bold tracking-tight text-foreground mb-4">
+              Create account
+            </h1>
+            <p className="text-muted-foreground">
+              Sign up with your university email to start sharing and browsing offers
+            </p>
+          </div>
+
+          {/* Form */}
+          <form onSubmit={handleSignup} className="space-y-6">
+            <div className="space-y-2">
+              <Label htmlFor="displayName" className="font-mono text-xs tracking-widest uppercase text-muted-foreground">
+                Display Name <span className="text-border">(Optional)</span>
+              </Label>
+              <Input
+                id="displayName"
+                type="text"
+                placeholder="John Doe"
+                value={displayName}
+                onChange={(e) => setDisplayName(e.target.value)}
+                maxLength={50}
+                className="h-14"
+              />
             </div>
-            <CardTitle className="text-2xl">Create Your Account</CardTitle>
-            <CardDescription>
-              Join GooseDoor with your university email
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSignup} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="displayName">Display Name (Optional)</Label>
-                <Input
-                  id="displayName"
-                  type="text"
-                  placeholder="John Doe"
-                  value={displayName}
-                  onChange={(e) => setDisplayName(e.target.value)}
-                  maxLength={50}
-                />
-              </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="email">University Email *</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="yourname@uwaterloo.ca or yourname@school.edu"
-                  value={email}
-                  onChange={(e) => {
-                    setEmail(e.target.value);
-                    validateEmail(e.target.value);
-                  }}
-                  required
-                  autoComplete="email"
-                />
-                {emailError ? (
-                  <p className="text-sm text-destructive flex items-center gap-1">
-                    <AlertCircle className="h-3 w-3" />
-                    {emailError}
-                  </p>
-                ) : isEmailValid ? (
-                  <p className="text-sm text-green-600 flex items-center gap-1">
-                    <CheckCircle2 className="h-3 w-3" />
-                    Valid university email
-                  </p>
-                ) : null}
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="password">Password *</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => {
-                    setPassword(e.target.value);
-                    validatePassword(e.target.value, confirmPassword);
-                  }}
-                  required
-                  autoComplete="new-password"
-                />
-                <p className="text-xs text-muted-foreground">
-                  Minimum 8 characters
+            <div className="space-y-2">
+              <Label htmlFor="email" className="font-mono text-xs tracking-widest uppercase text-muted-foreground">
+                University Email *
+              </Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="yourname@uwaterloo.ca"
+                value={email}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  validateEmail(e.target.value);
+                }}
+                required
+                autoComplete="email"
+                className="h-14"
+              />
+              {emailError ? (
+                <p className="text-sm text-destructive flex items-center gap-2">
+                  <AlertCircle className="h-4 w-4" strokeWidth={1.5} />
+                  {emailError}
                 </p>
-              </div>
+              ) : isEmailValid ? (
+                <p className="text-sm text-accent flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4" strokeWidth={1.5} />
+                  Valid university email
+                </p>
+              ) : null}
+            </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirm Password *</Label>
-                <Input
-                  id="confirmPassword"
-                  type="password"
-                  value={confirmPassword}
-                  onChange={(e) => {
-                    setConfirmPassword(e.target.value);
-                    validatePassword(password, e.target.value);
-                  }}
-                  required
-                  autoComplete="new-password"
-                />
-                {passwordError && (
-                  <p className="text-sm text-destructive flex items-center gap-1">
-                    <AlertCircle className="h-3 w-3" />
-                    {passwordError}
-                  </p>
-                )}
-                {!passwordError && confirmPassword && password === confirmPassword && (
-                  <p className="text-sm text-green-600 flex items-center gap-1">
-                    <CheckCircle2 className="h-3 w-3" />
-                    Passwords match
-                  </p>
-                )}
-              </div>
+            <div className="space-y-2">
+              <Label htmlFor="password" className="font-mono text-xs tracking-widest uppercase text-muted-foreground">
+                Password *
+              </Label>
+              <Input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  validatePassword(e.target.value, confirmPassword);
+                }}
+                required
+                autoComplete="new-password"
+                className="h-14"
+              />
+              <p className="font-mono text-xs text-muted-foreground">
+                Minimum 8 characters
+              </p>
+            </div>
 
-              <Alert>
-                <AlertCircle className="h-4 w-4" />
-                <AlertDescription className="text-sm">
-                  Only students with .edu or @uwaterloo.ca emails can sign up. 
-                  You'll receive a verification email after signing up.
-                </AlertDescription>
-              </Alert>
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword" className="font-mono text-xs tracking-widest uppercase text-muted-foreground">
+                Confirm Password *
+              </Label>
+              <Input
+                id="confirmPassword"
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => {
+                  setConfirmPassword(e.target.value);
+                  validatePassword(password, e.target.value);
+                }}
+                required
+                autoComplete="new-password"
+                className="h-14"
+              />
+              {passwordError && (
+                <p className="text-sm text-destructive flex items-center gap-2">
+                  <AlertCircle className="h-4 w-4" strokeWidth={1.5} />
+                  {passwordError}
+                </p>
+              )}
+              {!passwordError && confirmPassword && password === confirmPassword && (
+                <p className="text-sm text-accent flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4" strokeWidth={1.5} />
+                  Passwords match
+                </p>
+              )}
+            </div>
 
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={isLoading || !!emailError || !!passwordError}
-              >
-                {isLoading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Creating account...
-                  </>
-                ) : (
-                  "Create Account"
-                )}
-              </Button>
-            </form>
-          </CardContent>
-          <CardFooter className="flex flex-col space-y-2">
-            <div className="text-sm text-muted-foreground text-center">
+            {/* Info box */}
+            <div className="border border-border p-4 text-sm text-muted-foreground">
+              <p className="flex items-start gap-2">
+                <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" strokeWidth={1.5} />
+                Only students with university emails can sign up. You'll receive a verification email after signing up.
+              </p>
+            </div>
+
+            <Button
+              type="submit"
+              className="w-full"
+              size="lg"
+              disabled={isLoading || !!emailError || !!passwordError}
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Creating account...
+                </>
+              ) : (
+                <>
+                  Create Account
+                  <ArrowRight className="ml-2 h-4 w-4" strokeWidth={1.5} />
+                </>
+              )}
+            </Button>
+          </form>
+
+          {/* Footer */}
+          <div className="mt-8 pt-8 border-t border-border text-center">
+            <p className="text-sm text-muted-foreground">
               Already have an account?{" "}
-              <Link to="/login" className="text-primary hover:underline font-medium">
+              <Link to="/login" className="text-accent hover:underline font-semibold">
                 Sign in
               </Link>
-            </div>
-          </CardFooter>
-        </Card>
+            </p>
+          </div>
+        </div>
       </main>
     </div>
   );
 }
-
