@@ -1,19 +1,25 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 export function useBookmarks() {
   const [bookmarks, setBookmarks] = useState<string[]>([]);
+  const isInitialized = useRef(false);
 
-  // Load bookmarks from localStorage on mount
   useEffect(() => {
     const stored = localStorage.getItem("goosedoor-bookmarks");
     if (stored) {
-      setBookmarks(JSON.parse(stored));
+      try {
+        setBookmarks(JSON.parse(stored));
+      } catch {
+        setBookmarks([]);
+      }
     }
+    isInitialized.current = true;
   }, []);
 
-  // Save bookmarks to localStorage whenever they change
   useEffect(() => {
-    localStorage.setItem("goosedoor-bookmarks", JSON.stringify(bookmarks));
+    if (isInitialized.current) {
+      localStorage.setItem("goosedoor-bookmarks", JSON.stringify(bookmarks));
+    }
   }, [bookmarks]);
 
   const addBookmark = (offerId: string) => {
@@ -28,11 +34,12 @@ export function useBookmarks() {
   };
 
   const toggleBookmark = (offerId: string) => {
-    if (bookmarks.includes(offerId)) {
-      removeBookmark(offerId);
-    } else {
-      addBookmark(offerId);
-    }
+    setBookmarks((prev) => {
+      if (prev.includes(offerId)) {
+        return prev.filter((id) => id !== offerId);
+      }
+      return [...prev, offerId];
+    });
   };
 
   const isBookmarked = (offerId: string) => bookmarks.includes(offerId);
@@ -46,4 +53,3 @@ export function useBookmarks() {
     bookmarkCount: bookmarks.length,
   };
 }
-
