@@ -123,7 +123,6 @@ export default function MySubmissions() {
       <Navigation />
 
       <main className="container mx-auto py-12 md:py-20">
-        {/* Header */}
         <div className="mb-12">
           <span className="font-mono text-xs tracking-widest text-accent uppercase block mb-4">
             {offers.length} submission{offers.length !== 1 ? 's' : ''}
@@ -156,7 +155,6 @@ export default function MySubmissions() {
             {offers.map((offer) => (
               <Card key={offer.id} className="bg-background border-0 hover:bg-muted/50 transition-colors duration-150">
                 <CardContent className="p-6 md:p-8 space-y-4">
-                  {/* Company & Role */}
                   <div>
                     <div className="flex items-center gap-2 mb-1">
                       <h3 className="font-display text-xl font-bold tracking-tight text-foreground">
@@ -177,7 +175,6 @@ export default function MySubmissions() {
                     )}
                   </div>
 
-                  {/* Tags */}
                   <div className="flex flex-wrap gap-2">
                     {offer.job_type && (
                       <span className="font-mono text-xs tracking-wide text-muted-foreground border border-border px-2 py-0.5">
@@ -196,7 +193,6 @@ export default function MySubmissions() {
                     )}
                   </div>
 
-                  {/* Details */}
                   <div className="space-y-2 text-sm">
                     <div className="flex items-center gap-2 text-muted-foreground">
                       <MapPin className="h-4 w-4" strokeWidth={1.5} />
@@ -208,7 +204,6 @@ export default function MySubmissions() {
                     </div>
                   </div>
 
-                  {/* Salary */}
                   <div className="pt-2 border-t border-border">
                     <div className="font-mono text-2xl font-bold tracking-tight text-accent">
                       ${offer.salary_hourly}
@@ -216,7 +211,6 @@ export default function MySubmissions() {
                     </div>
                   </div>
 
-                  {/* Rating */}
                   {offer.experience_rating && (
                     <div className="flex items-center gap-1">
                       {[...Array(5)].map((_, i) => (
@@ -230,7 +224,6 @@ export default function MySubmissions() {
                     </div>
                   )}
 
-                  {/* Tech Stack */}
                   {offer.tech_stack.length > 0 && (
                     <div className="flex flex-wrap gap-1.5">
                       {offer.tech_stack.map((tech) => (
@@ -241,19 +234,16 @@ export default function MySubmissions() {
                     </div>
                   )}
 
-                  {/* Review */}
                   {offer.review_text && (
                     <p className="text-sm text-muted-foreground italic border-l-2 border-accent pl-3 leading-relaxed line-clamp-2">
                       "{offer.review_text}"
                     </p>
                   )}
 
-                  {/* Metadata */}
                   <div className="font-mono text-xs text-muted-foreground pt-2 border-t border-border">
                     Submitted {formatDate(offer.created_at)}
                   </div>
 
-                  {/* Actions */}
                   <div className="flex gap-2 pt-2">
                     <Button
                       variant="outline"
@@ -288,7 +278,6 @@ export default function MySubmissions() {
         )}
       </main>
 
-      {/* Delete Confirmation Dialog */}
       <AlertDialog open={!!offerToDelete} onOpenChange={() => setOfferToDelete(null)}>
         <AlertDialogContent className="border-border bg-card">
           <AlertDialogHeader>

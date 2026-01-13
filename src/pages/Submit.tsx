@@ -15,8 +15,6 @@ import { UNIVERSITIES, detectUniversityFromEmail } from "@/lib/universities";
 import { TECHNOLOGIES } from "@/lib/technologies";
 import { cn } from "@/lib/utils";
 
-// Removed - using TECHNOLOGIES from lib/technologies.ts now
-
 const JOB_TYPE_OPTIONS = ["SWE", "PM", "ML", "DS", "Quant", "IT", "Other"];
 const LEVEL_OPTIONS = ["Junior", "Returning Co-op", "Grad Pipeline"];
 const WORK_TYPE_OPTIONS = ["Remote", "Hybrid", "Onsite"];
@@ -48,10 +46,9 @@ export default function Submit() {
   const [isUniversityLocked, setIsUniversityLocked] = useState(false);
   const [techStackOpen, setTechStackOpen] = useState(false);
   const [customJobType, setCustomJobType] = useState("");
-  const [honeypot, setHoneypot] = useState(""); // Bot trap
+  const [honeypot, setHoneypot] = useState("");
   const [formStartTime, setFormStartTime] = useState<number>(0);
 
-  // Check authentication
   useEffect(() => {
     const checkAuth = async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -62,7 +59,6 @@ export default function Submit() {
         return;
       }
       
-      // Verify email domain
       const email = user.email?.toLowerCase() || "";
       const isAcademicEmail = email.endsWith('.edu') || email.endsWith('.edu.au') || 
                              email.endsWith('.ca') || email.endsWith('.ac.uk');
@@ -77,12 +73,11 @@ export default function Submit() {
       setUser(user);
       setIsCheckingAuth(false);
       
-      // Auto-detect university from email
       if (user.email) {
         const detectedUniversity = detectUniversityFromEmail(user.email);
         if (detectedUniversity) {
           setFormData(prev => ({ ...prev, university: detectedUniversity }));
-          setIsUniversityLocked(true); // Lock the field when auto-detected
+          setIsUniversityLocked(true);
         }
       }
     };
@@ -93,7 +88,7 @@ export default function Submit() {
     const lastSubmission = localStorage.getItem("lastSubmissionTime");
     if (lastSubmission) {
       const timeSinceLastSubmit = Date.now() - parseInt(lastSubmission);
-      const minWaitTime = 2 * 60 * 1000; // 2 minutes
+      const minWaitTime = 2 * 60 * 1000;
       
       if (timeSinceLastSubmit < minWaitTime) {
         const remainingTime = Math.ceil((minWaitTime - timeSinceLastSubmit) / 1000);
@@ -121,14 +116,12 @@ export default function Submit() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Bot protection: honeypot field
     if (honeypot !== "") {
       console.log("Bot detected via honeypot");
       toast.error("Submission failed. Please try again.");
       return;
     }
 
-    // Bot protection: check if form was filled too quickly (< 5 seconds)
     const timeToFillForm = Date.now() - formStartTime;
     if (timeToFillForm < 5000) {
       console.log("Bot detected - form filled too quickly");
@@ -136,7 +129,6 @@ export default function Submit() {
       return;
     }
 
-    // Validation: Check salary limit (max $300/hour)
     const salary = parseFloat(formData.salary_hourly);
     if (salary > 300) {
       toast.error("Maximum hourly rate is $300/hour. Please enter a realistic co-op salary.");
@@ -147,7 +139,6 @@ export default function Submit() {
       return;
     }
 
-    // Validation: Check review word count (max 150 words)
     if (formData.review_text.trim()) {
       const wordCount = formData.review_text.trim().split(/\s+/).length;
       if (wordCount > 150) {
@@ -156,7 +147,6 @@ export default function Submit() {
       }
     }
 
-    // Validation: Check field lengths
     if (formData.company_name.trim().length < 2) {
       toast.error("Company name must be at least 2 characters.");
       return;
@@ -166,11 +156,10 @@ export default function Submit() {
       return;
     }
 
-    // Rate limiting check
     const lastSubmission = localStorage.getItem("lastSubmissionTime");
     if (lastSubmission) {
       const timeSinceLastSubmit = Date.now() - parseInt(lastSubmission);
-      const minWaitTime = 2 * 60 * 1000; // 2 minutes between submissions
+      const minWaitTime = 2 * 60 * 1000;
       
       if (timeSinceLastSubmit < minWaitTime) {
         const remainingTime = Math.ceil((minWaitTime - timeSinceLastSubmit) / 1000);
@@ -182,40 +171,38 @@ export default function Submit() {
     setIsSubmitting(true);
 
     try {
-      // Ensure user is authenticated
       if (!user) {
         toast.error("Please log in to submit offers");
         navigate("/login");
         return;
       }
 
-      // Check if user has UWaterloo email for verified badge
-      const isUWaterlooVerified = user.email?.toLowerCase().endsWith('@uwaterloo.ca') || false;
+      const isUWaterlooVerified = user.email?.toLowerCase().endsWith('@uwaterloo.ca');
 
-      const { data: newOffer, error} = await supabase.from("offers").insert({
+      const { data, error } = await supabase.from("offers").insert({
         company_name: formData.company_name,
         role_title: formData.role_title,
         location: formData.location,
         salary_hourly: parseFloat(formData.salary_hourly),
         currency: formData.currency,
         tech_stack: formData.tech_stack,
-        experience_rating: formData.experience_rating ? parseInt(formData.experience_rating) : null,
+        experience_rating: parseInt(formData.experience_rating),
         review_text: formData.review_text || null,
         program: formData.program || null,
         year_of_study: formData.year_of_study || null,
         term: formData.term,
-        job_type: customJobType || formData.job_type || null,
+        job_type: formData.job_type === "Other" ? customJobType : formData.job_type || null,
         level: formData.level || null,
         work_type: formData.work_type || null,
         university: formData.university || null,
         verified_uwaterloo: isUWaterlooVerified,
+        is_verified: isUWaterlooVerified,
         user_id: user.id,
         user_email: user.email,
       }).select().single();
 
       if (error) throw error;
 
-      // Store submission time for rate limiting
       localStorage.setItem("lastSubmissionTime", Date.now().toString());
 
       if (isUWaterlooVerified) {
@@ -575,7 +562,6 @@ export default function Submit() {
                   </PopoverContent>
                 </Popover>
                 
-                {/* Show selected tech stack */}
                 {formData.tech_stack.length > 0 && (
                   <div className="flex flex-wrap gap-2 mt-2">
                     {formData.tech_stack.map((tech) => (
@@ -625,7 +611,6 @@ export default function Submit() {
                 )}
               </div>
 
-              {/* Honeypot field - hidden from users, catches bots */}
               <div style={{ position: 'absolute', left: '-9999px' }} aria-hidden="true">
                 <Input
                   type="text"

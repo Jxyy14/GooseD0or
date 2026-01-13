@@ -60,7 +60,6 @@ export default function Saved() {
       <Navigation />
 
       <main className="container mx-auto py-12 md:py-20">
-        {/* Header */}
         <div className="mb-12">
           <span className="font-mono text-xs tracking-widest text-accent uppercase block mb-4">
             {savedOffers.length} saved offers
@@ -93,7 +92,6 @@ export default function Saved() {
             {savedOffers.map((offer) => (
               <Card key={offer.id} className="bg-background border-0 hover:bg-muted/50 transition-colors duration-150 relative">
                 <CardContent className="p-6 md:p-8 space-y-4">
-                  {/* Remove Button */}
                   <button
                     onClick={() => removeBookmark(offer.id)}
                     className="absolute top-4 right-4 text-muted-foreground hover:text-destructive transition-colors duration-150"
@@ -102,7 +100,6 @@ export default function Saved() {
                     <Trash2 className="h-5 w-5" strokeWidth={1.5} />
                   </button>
 
-                  {/* Company & Role */}
                   <div>
                     <div className="flex items-center gap-2 mb-1">
                       <h3 className="font-display text-xl font-bold tracking-tight text-foreground">
@@ -113,7 +110,7 @@ export default function Saved() {
                           className="font-mono text-[10px] tracking-wider px-1.5 py-0.5 bg-accent/10 text-accent border border-accent/20" 
                           title="Verified UWaterloo student"
                         >
-                          🪿 UW
+                          UW
                         </span>
                       )}
                     </div>
@@ -123,7 +120,6 @@ export default function Saved() {
                     )}
                   </div>
 
-                  {/* Tags */}
                   <div className="flex flex-wrap gap-2">
                     {offer.job_type && (
                       <span className="font-mono text-xs tracking-wide text-muted-foreground border border-border px-2 py-0.5">
@@ -142,7 +138,6 @@ export default function Saved() {
                     )}
                   </div>
 
-                  {/* Details */}
                   <div className="space-y-2 text-sm">
                     <div className="flex items-center gap-2 text-muted-foreground">
                       <MapPin className="h-4 w-4" strokeWidth={1.5} />
@@ -154,7 +149,6 @@ export default function Saved() {
                     </div>
                   </div>
 
-                  {/* Salary - prominent */}
                   <div className="pt-2 border-t border-border">
                     <div className="font-mono text-2xl font-bold tracking-tight text-accent">
                       ${offer.salary_hourly}
@@ -162,7 +156,6 @@ export default function Saved() {
                     </div>
                   </div>
 
-                  {/* Rating */}
                   <div className="flex items-center gap-1">
                     {[...Array(5)].map((_, i) => (
                       <Star 
@@ -174,7 +167,6 @@ export default function Saved() {
                     <span className="text-sm text-muted-foreground ml-1">{offer.experience_rating}/5</span>
                   </div>
 
-                  {/* Tech Stack */}
                   {offer.tech_stack && offer.tech_stack.length > 0 && (
                     <div className="flex flex-wrap gap-1.5">
                       {offer.tech_stack.map((tech) => (
@@ -193,4 +185,3 @@ export default function Saved() {
     </div>
   );
 }
-

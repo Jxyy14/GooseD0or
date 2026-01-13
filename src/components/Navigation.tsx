@@ -38,14 +38,12 @@ export function Navigation() {
     <nav className="bg-background border-b border-border sticky top-0 z-50">
       <div className="container mx-auto">
         <div className="flex h-16 items-center justify-between">
-          {/* Logo - Bold typographic treatment */}
           <Link to="/" className="flex items-center group">
             <span className="font-display text-2xl font-bold tracking-tight text-foreground group-hover:text-accent transition-colors duration-150">
               GOOSEDOOR
             </span>
           </Link>
 
-          {/* Desktop Navigation - Minimal links with underline hover */}
           <nav className="hidden md:flex items-center gap-8">
             <NavLink to="/browse">Browse</NavLink>
             <NavLink to="/analytics">Analytics</NavLink>
@@ -69,7 +67,6 @@ export function Navigation() {
             </button>
           </nav>
 
-          {/* Desktop Auth */}
           <div className="hidden md:flex items-center gap-4">
             {user ? (
               <>
@@ -99,7 +96,6 @@ export function Navigation() {
             )}
           </div>
 
-          {/* Mobile Menu Button */}
           <button
             className="md:hidden p-2 text-foreground hover:text-accent transition-colors duration-150"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -108,7 +104,6 @@ export function Navigation() {
           </button>
         </div>
 
-        {/* Mobile Menu */}
         {isMenuOpen && (
           <div className="md:hidden py-6 border-t border-border">
             <div className="flex flex-col gap-4">
@@ -163,7 +158,6 @@ export function Navigation() {
   );
 }
 
-// Desktop nav link with animated underline
 function NavLink({ to, children }: { to: string; children: React.ReactNode }) {
   return (
     <Link
@@ -176,7 +170,6 @@ function NavLink({ to, children }: { to: string; children: React.ReactNode }) {
   );
 }
 
-// Mobile nav link
 function MobileNavLink({ to, onClick, children }: { to: string; onClick: () => void; children: React.ReactNode }) {
   return (
     <Link

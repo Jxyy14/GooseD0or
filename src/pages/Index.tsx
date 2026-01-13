@@ -14,15 +14,12 @@ export default function Index() {
 
   const fetchStats = async () => {
     try {
-      console.log("Fetching stats from Supabase...");
       const { data: offers, error } = await supabase.from("offers").select("*");
       
       if (error) {
         console.error("Error fetching stats:", error.message, error.code, error.details, error);
         return;
       }
-      
-      console.log("Fetched offers:", offers?.length || 0);
       
       if (offers && offers.length > 0) {
         const avgSalaryUSD = offers.reduce((sum, o: any) => {
@@ -37,8 +34,6 @@ export default function Index() {
           
         const uniqueCompanies = new Set(offers.map(o => o.company_name)).size;
         const uniqueUniversities = new Set(offers.map((o: any) => o.university).filter(Boolean)).size;
-        
-        console.log("Setting stats:", { totalOffers: offers.length, avgSalaryUSD, avgSalaryCAD, companies: uniqueCompanies, universities: uniqueUniversities });
         
         setStats({
           totalOffers: offers.length,
@@ -57,9 +52,7 @@ export default function Index() {
     <div className="min-h-screen bg-background">
       <Navigation />
 
-      {/* Hero Section - Bold Typography */}
       <section className="relative pt-20 md:pt-28 lg:pt-40 pb-12 md:pb-16 overflow-hidden">
-        {/* Aurora Background */}
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute -top-1/2 -left-1/4 w-[150%] h-[200%]">
             <div className="absolute top-1/4 left-0 w-[600px] h-[600px] bg-amber-500/50 rounded-full blur-[150px] animate-aurora-1" />
@@ -69,29 +62,24 @@ export default function Index() {
         </div>
         <div className="container mx-auto relative z-10">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-12">
-            {/* Left side - Text content */}
             <div className="lg:max-w-2xl">
-              {/* Label */}
               <div className="mb-8">
                 <span className="font-mono text-xs tracking-widest text-accent uppercase">
                   Anonymous • Real • Verified
                 </span>
               </div>
 
-              {/* Main headline - extreme scale */}
               <h1 className="font-display text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tighter text-foreground max-w-5xl leading-none mb-8">
                 Internship salaries,
                 <br />
                 <span className="text-accent">uncovered.</span>
               </h1>
 
-              {/* Subhead */}
               <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mb-12 leading-relaxed">
                 Born at UWaterloo 🪿, now serving students from 350+ universities worldwide. 
                 Share offers, compare salaries, make informed decisions.
               </p>
 
-              {/* CTAs */}
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link to="/browse">
                   <Button size="lg" className="gap-3">
@@ -107,7 +95,6 @@ export default function Index() {
               </div>
             </div>
 
-            {/* Right side - Fading company logos */}
             <div className="hidden lg:block relative">
               <div className="relative w-[500px] h-[450px]" style={{ maskImage: 'linear-gradient(to right, black 60%, transparent 100%)', WebkitMaskImage: 'linear-gradient(to right, black 60%, transparent 100%)' }}>
                 <div className="grid grid-cols-4 gap-4">
@@ -144,7 +131,6 @@ export default function Index() {
         </div>
       </section>
 
-      {/* University Logos Marquee */}
       <section className="py-8 md:py-10 border-t border-border overflow-hidden">
         <div className="container mx-auto mb-5">
           <p className="font-mono text-xs tracking-widest text-muted-foreground uppercase text-center">
@@ -152,11 +138,9 @@ export default function Index() {
           </p>
         </div>
         <div className="relative">
-          {/* Gradient masks */}
           <div className="absolute left-0 top-0 bottom-0 w-24 md:w-40 bg-gradient-to-r from-background to-transparent z-10" />
           <div className="absolute right-0 top-0 bottom-0 w-24 md:w-40 bg-gradient-to-l from-background to-transparent z-10" />
           
-          {/* Scrolling container - infinite seamless */}
           <div className="marquee-container">
             <div className="marquee-content">
               <UniversityList />
@@ -166,7 +150,6 @@ export default function Index() {
         </div>
       </section>
 
-      {/* Stats Section - Monospace numbers, editorial layout */}
       <section className="border-t border-b border-border">
         <div className="container mx-auto">
           <div className="grid grid-cols-2 md:grid-cols-4">
@@ -194,10 +177,8 @@ export default function Index() {
         </div>
       </section>
 
-      {/* Features Section - Typography-driven */}
       <section className="py-20 md:py-28 lg:py-32">
         <div className="container mx-auto">
-          {/* Section header */}
           <div className="mb-16 md:mb-20">
             <span className="font-mono text-xs tracking-widest text-accent uppercase block mb-4">
               Why GooseDoor
@@ -207,7 +188,6 @@ export default function Index() {
             </h2>
           </div>
 
-          {/* Features grid - asymmetric */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-border">
             <FeatureCard
               number="01"
@@ -233,7 +213,6 @@ export default function Index() {
         </div>
       </section>
 
-      {/* CTA Section - Amber */}
       <section className="bg-accent text-background py-20 md:py-28">
         <div className="container mx-auto">
           <div className="max-w-3xl">
@@ -270,7 +249,6 @@ export default function Index() {
         </div>
       </section>
 
-      {/* Footer - Minimal */}
       <footer className="border-t border-border py-12">
         <div className="container mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
@@ -284,7 +262,7 @@ export default function Index() {
               </p>
             </div>
             <div className="text-xs text-muted-foreground">
-              <p>⚠️ All data is user-submitted. Use at your own discretion.</p>
+              <p>All data is user-submitted. Use at your own discretion.</p>
               <p className="mt-1">
                 <a href="https://twitter.com/wehliyejaffer" className="hover:text-foreground transition-colors">Twitter</a>
                 {" • "}
@@ -298,7 +276,6 @@ export default function Index() {
   );
 }
 
-// Stat block component
 function StatBlock({ 
   number, 
   label, 
@@ -322,7 +299,6 @@ function StatBlock({
   );
 }
 
-// Feature card component
 function FeatureCard({ 
   number, 
   title, 
@@ -334,15 +310,12 @@ function FeatureCard({
 }) {
   return (
     <div className="bg-background p-8 md:p-12">
-      {/* Number */}
       <div className="font-mono text-xs tracking-widest text-accent mb-6">
         {number}
       </div>
-      {/* Title */}
       <h3 className="font-display text-2xl md:text-3xl font-bold tracking-tight text-foreground mb-4">
         {title}
       </h3>
-      {/* Description */}
       <p className="text-muted-foreground leading-relaxed">
         {description}
       </p>
@@ -350,7 +323,6 @@ function FeatureCard({
   );
 }
 
-// University logos for marquee
 const universities = [
   { name: "UWaterloo", logo: "https://upload.wikimedia.org/wikipedia/en/thumb/6/6e/University_of_Waterloo_seal.svg/150px-University_of_Waterloo_seal.svg.png" },
   { name: "UofT", logo: "https://upload.wikimedia.org/wikipedia/en/thumb/0/04/Utoronto_coa.svg/150px-Utoronto_coa.svg.png" },

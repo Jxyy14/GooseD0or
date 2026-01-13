@@ -56,7 +56,6 @@ export default function Analytics() {
     }
   };
 
-  // Calculate top universities by offer count
   const topUniversities = offers
     .filter(offer => offer.university)
     .reduce((acc, offer) => {
@@ -72,7 +71,6 @@ export default function Analytics() {
     .sort((a, b) => b.count - a.count)
     .slice(0, 10);
 
-  // Calculate offers by term
   const termData = offers
     .reduce((acc, offer) => {
       const term = offer.term || 'Unknown';
@@ -86,7 +84,6 @@ export default function Analytics() {
 
   const COLORS = ["#FFC72C", "#FFD700", "#FFE44D", "#FFF066", "#FFED80", "#FFEB99", "#FFF2B2", "#FFF9CC"];
 
-  // Convert all salaries to USD (CAD * 0.71 = USD) and average
   const avgSalaryUSD = offers.length > 0
     ? (offers.reduce((sum, o) => {
         const salaryInUSD = o.currency === 'CAD' ? o.salary_hourly * 0.71 : o.salary_hourly;
@@ -94,7 +91,6 @@ export default function Analytics() {
       }, 0) / offers.length).toFixed(2)
     : "0";
     
-  // Convert all salaries to CAD (USD * 1.41 = CAD) and average
   const avgSalaryCAD = offers.length > 0
     ? (offers.reduce((sum, o) => {
         const salaryInCAD = o.currency === 'USD' ? o.salary_hourly * 1.41 : o.salary_hourly;
@@ -102,7 +98,6 @@ export default function Analytics() {
       }, 0) / offers.length).toFixed(2)
     : "0";
 
-  // Count unique universities
   const uniqueUniversities = useMemo(() => {
     const unis = new Set(offers.map(o => o.university).filter(Boolean));
     return unis.size;

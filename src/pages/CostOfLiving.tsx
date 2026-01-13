@@ -5,8 +5,6 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { ArrowRight, DollarSign, MapPin, TrendingUp, TrendingDown, Minus } from "lucide-react";
 
-// Cost of Living Index data (US average = 100)
-// Sources: Numbeo, BLS, various COL calculators
 const CITIES = [
   { name: "San Francisco, CA", index: 179, country: "USA", currency: "USD" },
   { name: "New York, NY", index: 187, country: "USA", currency: "USD" },
@@ -40,7 +38,6 @@ const CITIES = [
   { name: "Remote (US Average)", index: 100, country: "USA", currency: "USD" },
 ];
 
-// Currency conversion rates to USD (approximate)
 const CURRENCY_TO_USD: Record<string, number> = {
   USD: 1,
   CAD: 0.74,
@@ -58,24 +55,20 @@ export default function CostOfLiving() {
 
   const sourceData = CITIES.find(c => c.name === sourceCity);
 
-  // Calculate equivalent salaries for all cities
   const comparisons = useMemo(() => {
     if (!sourceData || !salary || isNaN(parseFloat(salary))) return [];
 
     const salaryNum = parseFloat(salary);
     const sourceIndex = sourceData.index;
     
-    // Convert input salary to USD for consistent calculations
     const salaryInUSD = currency === "CAD" ? salaryNum * 0.74 : salaryNum;
 
     return CITIES
       .filter(city => city.name !== sourceCity)
       .map(city => {
-        // Adjust for cost of living difference (in USD)
         const adjustedSalaryUSD = (salaryInUSD * city.index) / sourceIndex;
         const purchasingPowerUSD = (salaryInUSD * sourceIndex) / city.index;
         
-        // Convert back to selected currency for display
         const conversionRate = currency === "CAD" ? 1.35 : 1;
         const adjustedSalary = adjustedSalaryUSD * conversionRate;
         const purchasingPower = purchasingPowerUSD * conversionRate;
@@ -98,7 +91,6 @@ export default function CostOfLiving() {
       <Navigation />
 
       <main className="container mx-auto py-12 md:py-20">
-        {/* Header */}
         <div className="mb-12">
           <span className="font-mono text-xs tracking-widest text-accent uppercase block mb-4">
             Compare across {CITIES.length} cities
@@ -112,11 +104,9 @@ export default function CostOfLiving() {
           </p>
         </div>
 
-        {/* Input Section */}
         <Card className="mb-8">
           <CardContent className="p-6 md:p-8">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {/* Salary Input */}
               <div className="space-y-2">
                 <Label className="font-mono text-xs tracking-widest uppercase">
                   Hourly Salary
@@ -134,7 +124,6 @@ export default function CostOfLiving() {
                 <p className="text-xs text-muted-foreground">per hour</p>
               </div>
 
-              {/* Currency */}
               <div className="space-y-2">
                 <Label className="font-mono text-xs tracking-widest uppercase">
                   Currency
@@ -163,7 +152,6 @@ export default function CostOfLiving() {
                 </div>
               </div>
 
-              {/* Source City */}
               <div className="space-y-2">
                 <Label className="font-mono text-xs tracking-widest uppercase">
                   Your City
@@ -182,7 +170,6 @@ export default function CostOfLiving() {
               </div>
             </div>
 
-            {/* Summary */}
             {sourceData && salary && (
               <div className="mt-6 pt-6 border-t border-border">
                 <p className="text-muted-foreground">
@@ -196,7 +183,6 @@ export default function CostOfLiving() {
           </CardContent>
         </Card>
 
-        {/* Results */}
         <div className="mb-6">
           <h2 className="font-display text-2xl font-bold tracking-tight mb-2">
             Equivalent Salaries
@@ -215,7 +201,6 @@ export default function CostOfLiving() {
             return (
               <Card key={city.name} className="bg-background border-0">
                 <CardContent className="p-6">
-                  {/* City Name */}
                   <div className="flex items-start justify-between mb-4">
                     <div>
                       <h3 className="font-semibold text-foreground">{city.name}</h3>
@@ -231,7 +216,6 @@ export default function CostOfLiving() {
                     </div>
                   </div>
 
-                  {/* Equivalent Salary */}
                   <div className="mb-4">
                     <p className="text-xs text-muted-foreground mb-1">You'd need to earn</p>
                     <p className="font-mono text-2xl font-bold text-accent">
@@ -240,7 +224,6 @@ export default function CostOfLiving() {
                     </p>
                   </div>
 
-                  {/* Purchasing Power */}
                   <div className="pt-4 border-t border-border">
                     <p className="text-xs text-muted-foreground mb-1">
                       Your ${salary} {currency}/hr feels like
@@ -256,10 +239,9 @@ export default function CostOfLiving() {
           })}
         </div>
 
-        {/* Disclaimer */}
         <div className="mt-12 p-6 border border-border">
           <p className="text-sm text-muted-foreground">
-            <strong className="text-foreground">⚠️ Disclaimer:</strong> Cost of living indices are approximations 
+            <strong className="text-foreground">Disclaimer:</strong> Cost of living indices are approximations 
             based on various sources (Numbeo, BLS, etc.) and may not reflect your personal spending habits. 
             Housing costs vary significantly within cities. Use this as a rough guide, not exact figures.
           </p>
@@ -268,4 +250,3 @@ export default function CostOfLiving() {
     </div>
   );
 }
-
