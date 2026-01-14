@@ -6,35 +6,35 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ArrowRight, DollarSign, MapPin, TrendingUp, TrendingDown, Minus } from "lucide-react";
 
 const CITIES = [
-  { name: "San Francisco, CA", index: 179, country: "USA", currency: "USD" },
   { name: "New York, NY", index: 187, country: "USA", currency: "USD" },
-  { name: "Seattle, WA", index: 156, country: "USA", currency: "USD" },
+  { name: "San Francisco, CA", index: 179, country: "USA", currency: "USD" },
   { name: "Los Angeles, CA", index: 166, country: "USA", currency: "USD" },
-  { name: "Boston, MA", index: 152, country: "USA", currency: "USD" },
-  { name: "Austin, TX", index: 110, country: "USA", currency: "USD" },
-  { name: "Denver, CO", index: 128, country: "USA", currency: "USD" },
-  { name: "Chicago, IL", index: 107, country: "USA", currency: "USD" },
-  { name: "Atlanta, GA", index: 106, country: "USA", currency: "USD" },
-  { name: "Miami, FL", index: 123, country: "USA", currency: "USD" },
-  { name: "Washington, DC", index: 152, country: "USA", currency: "USD" },
   { name: "San Diego, CA", index: 160, country: "USA", currency: "USD" },
-  { name: "Portland, OR", index: 130, country: "USA", currency: "USD" },
-  { name: "Phoenix, AZ", index: 103, country: "USA", currency: "USD" },
+  { name: "Seattle, WA", index: 149, country: "USA", currency: "USD" },
+  { name: "Washington, DC", index: 148, country: "USA", currency: "USD" },
+  { name: "Boston, MA", index: 146, country: "USA", currency: "USD" },
+  { name: "Miami, FL", index: 123, country: "USA", currency: "USD" },
+  { name: "Denver, CO", index: 118, country: "USA", currency: "USD" },
+  { name: "Chicago, IL", index: 116, country: "USA", currency: "USD" },
+  { name: "Portland, OR", index: 114, country: "USA", currency: "USD" },
+  { name: "Austin, TX", index: 108, country: "USA", currency: "USD" },
+  { name: "Atlanta, GA", index: 105, country: "USA", currency: "USD" },
   { name: "Dallas, TX", index: 104, country: "USA", currency: "USD" },
-  { name: "Pittsburgh, PA", index: 96, country: "USA", currency: "USD" },
-  { name: "Toronto, ON", index: 142, country: "Canada", currency: "CAD" },
-  { name: "Vancouver, BC", index: 156, country: "Canada", currency: "CAD" },
-  { name: "Montreal, QC", index: 118, country: "Canada", currency: "CAD" },
-  { name: "Ottawa, ON", index: 120, country: "Canada", currency: "CAD" },
-  { name: "Calgary, AB", index: 122, country: "Canada", currency: "CAD" },
-  { name: "Waterloo, ON", index: 108, country: "Canada", currency: "CAD" },
-  { name: "London, UK", index: 171, country: "UK", currency: "GBP" },
-  { name: "Singapore", index: 134, country: "Singapore", currency: "SGD" },
-  { name: "Zurich, Switzerland", index: 206, country: "Switzerland", currency: "CHF" },
-  { name: "Berlin, Germany", index: 112, country: "Germany", currency: "EUR" },
-  { name: "Dublin, Ireland", index: 145, country: "Ireland", currency: "EUR" },
-  { name: "Amsterdam, Netherlands", index: 138, country: "Netherlands", currency: "EUR" },
-  { name: "Sydney, Australia", index: 143, country: "Australia", currency: "AUD" },
+  { name: "Phoenix, AZ", index: 102, country: "USA", currency: "USD" },
+  { name: "Pittsburgh, PA", index: 93, country: "USA", currency: "USD" },
+  { name: "Vancouver, BC", index: 121, country: "Canada", currency: "CAD" },
+  { name: "Toronto, ON", index: 113, country: "Canada", currency: "CAD" },
+  { name: "Calgary, AB", index: 98, country: "Canada", currency: "CAD" },
+  { name: "Ottawa, ON", index: 96, country: "Canada", currency: "CAD" },
+  { name: "Montreal, QC", index: 89, country: "Canada", currency: "CAD" },
+  { name: "Waterloo, ON", index: 85, country: "Canada", currency: "CAD" },
+  { name: "Zurich, Switzerland", index: 227, country: "Switzerland", currency: "CHF" },
+  { name: "London, UK", index: 148, country: "UK", currency: "GBP" },
+  { name: "Dublin, Ireland", index: 139, country: "Ireland", currency: "EUR" },
+  { name: "Sydney, Australia", index: 136, country: "Australia", currency: "AUD" },
+  { name: "Singapore", index: 131, country: "Singapore", currency: "SGD" },
+  { name: "Amsterdam, Netherlands", index: 124, country: "Netherlands", currency: "EUR" },
+  { name: "Berlin, Germany", index: 98, country: "Germany", currency: "EUR" },
   { name: "Remote (US Average)", index: 100, country: "USA", currency: "USD" },
 ];
 
@@ -241,9 +241,9 @@ export default function CostOfLiving() {
 
         <div className="mt-12 p-6 border border-border">
           <p className="text-sm text-muted-foreground">
-            <strong className="text-foreground">Disclaimer:</strong> Cost of living indices are approximations 
-            based on various sources (Numbeo, BLS, etc.) and may not reflect your personal spending habits. 
-            Housing costs vary significantly within cities. Use this as a rough guide, not exact figures.
+            <strong className="text-foreground">Disclaimer:</strong> Cost of living indices are based on data from 
+            Numbeo, Expatistan, and PayScale (2025). Index 100 = US national average. Canadian cities are normalized 
+            to USD scale for comparison. Housing costs vary significantly within cities. Use this as a rough guide.
           </p>
         </div>
       </main>
