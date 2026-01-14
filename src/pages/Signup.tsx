@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Loader2, CheckCircle2, AlertCircle, ArrowRight } from "lucide-react";
+import { Loader2, CheckCircle2, AlertCircle, ArrowRight, ArrowLeft, Mail } from "lucide-react";
 
 export default function Signup() {
   const navigate = useNavigate();
@@ -17,6 +17,9 @@ export default function Signup() {
   const [isLoading, setIsLoading] = useState(false);
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
+  const [step, setStep] = useState<"form" | "otp">("form");
+  const [otpCode, setOtpCode] = useState("");
+  const [otpError, setOtpError] = useState("");
 
   const validateEmail = (email: string) => {
     if (!email) {
@@ -102,7 +105,6 @@ export default function Signup() {
           data: {
             display_name: displayName.trim() || undefined,
           },
-          emailRedirectTo: `${window.location.origin}/`,
         },
       });
 
@@ -121,8 +123,8 @@ export default function Signup() {
       }
 
       if (data.user) {
-        toast.success("Account created! Please check your email to verify. 📧");
-        navigate("/login");
+        toast.success("Verification code sent to your email!");
+        setStep("otp");
       }
     } catch (error) {
       console.error("Signup error:", error);
@@ -132,8 +134,181 @@ export default function Signup() {
     }
   };
 
+  const handleVerifyOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (otpCode.length !== 6) {
+      setOtpError("Please enter the 6-digit code");
+      return;
+    }
+    
+    setIsLoading(true);
+    setOtpError("");
+
+    try {
+      const { data, error } = await supabase.auth.verifyOtp({
+        email: email.toLowerCase().trim(),
+        token: otpCode,
+        type: "signup",
+      });
+
+      if (error) {
+        console.error("OTP verification error:", error);
+        if (error.message.includes("expired")) {
+          setOtpError("Code expired. Please request a new one.");
+        } else if (error.message.includes("invalid")) {
+          setOtpError("Invalid code. Please check and try again.");
+        } else {
+          setOtpError(error.message || "Verification failed.");
+        }
+        return;
+      }
+
+      if (data.user) {
+        toast.success("Account verified! Welcome to GooseDoor!");
+        navigate("/");
+      }
+    } catch (error) {
+      console.error("OTP verification error:", error);
+      setOtpError("An error occurred. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleResendCode = async () => {
+    setIsLoading(true);
+    setOtpError("");
+
+    try {
+      const { error } = await supabase.auth.resend({
+        type: "signup",
+        email: email.toLowerCase().trim(),
+      });
+
+      if (error) {
+        console.error("Resend error:", error);
+        toast.error(error.message || "Failed to resend code");
+        return;
+      }
+
+      toast.success("New code sent! Check your email.");
+    } catch (error) {
+      console.error("Resend error:", error);
+      toast.error("Failed to resend code");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const isEmailValid = email && (email.toLowerCase().endsWith('.edu') || email.toLowerCase().endsWith('@uwaterloo.ca')) && !emailError;
   const isPasswordValid = password && password.length >= 8 && !passwordError;
+
+  if (step === "otp") {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navigation />
+        
+        <main className="container mx-auto py-20 md:py-28">
+          <div className="max-w-md mx-auto">
+            <div className="mb-10">
+              <span className="font-mono text-xs tracking-widest text-accent uppercase block mb-4">
+                Verify your email
+              </span>
+              <h1 className="font-display text-4xl md:text-5xl font-bold tracking-tight text-foreground mb-4">
+                Enter code
+              </h1>
+              <p className="text-muted-foreground">
+                We sent a 6-digit verification code to{" "}
+                <span className="text-foreground font-semibold">{email}</span>
+              </p>
+            </div>
+
+            <form onSubmit={handleVerifyOtp} className="space-y-6">
+              <div className="space-y-2">
+                <Label htmlFor="otp" className="font-mono text-xs tracking-widest uppercase text-muted-foreground">
+                  Verification Code *
+                </Label>
+                <Input
+                  id="otp"
+                  type="text"
+                  placeholder="123456"
+                  value={otpCode}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, "").slice(0, 6);
+                    setOtpCode(value);
+                    setOtpError("");
+                  }}
+                  required
+                  autoComplete="one-time-code"
+                  className="h-14 text-center text-2xl font-mono tracking-[0.5em]"
+                  maxLength={6}
+                />
+                {otpError && (
+                  <p className="text-sm text-destructive flex items-center gap-2">
+                    <AlertCircle className="h-4 w-4" strokeWidth={1.5} />
+                    {otpError}
+                  </p>
+                )}
+              </div>
+
+              <div className="border border-border p-4 text-sm text-muted-foreground">
+                <p className="flex items-start gap-2">
+                  <Mail className="h-4 w-4 mt-0.5 shrink-0" strokeWidth={1.5} />
+                  Check your inbox and spam folder. The code expires in 1 hour.
+                </p>
+              </div>
+
+              <Button
+                type="submit"
+                className="w-full"
+                size="lg"
+                disabled={isLoading || otpCode.length !== 6}
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Verifying...
+                  </>
+                ) : (
+                  <>
+                    Verify Account
+                    <ArrowRight className="ml-2 h-4 w-4" strokeWidth={1.5} />
+                  </>
+                )}
+              </Button>
+            </form>
+
+            <div className="mt-6 flex flex-col gap-4">
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={handleResendCode}
+                disabled={isLoading}
+                className="w-full"
+              >
+                Didn't receive the code? Resend
+              </Button>
+              
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => {
+                  setStep("form");
+                  setOtpCode("");
+                  setOtpError("");
+                }}
+                className="w-full"
+              >
+                <ArrowLeft className="mr-2 h-4 w-4" strokeWidth={1.5} />
+                Back to signup
+              </Button>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -141,7 +316,6 @@ export default function Signup() {
       
       <main className="container mx-auto py-20 md:py-28">
         <div className="max-w-md mx-auto">
-          {/* Header */}
           <div className="mb-10">
             <span className="font-mono text-xs tracking-widest text-accent uppercase block mb-4">
               Join the community
@@ -154,7 +328,6 @@ export default function Signup() {
             </p>
           </div>
 
-          {/* Form */}
           <form onSubmit={handleSignup} className="space-y-6">
             <div className="space-y-2">
               <Label htmlFor="displayName" className="font-mono text-xs tracking-widest uppercase text-muted-foreground">
@@ -252,11 +425,10 @@ export default function Signup() {
               )}
             </div>
 
-            {/* Info box */}
             <div className="border border-border p-4 text-sm text-muted-foreground">
               <p className="flex items-start gap-2">
                 <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" strokeWidth={1.5} />
-                Only students with university emails can sign up. You'll receive a verification email after signing up.
+                Only students with university emails can sign up. You'll receive a 6-digit verification code after signing up.
               </p>
             </div>
 
@@ -269,7 +441,7 @@ export default function Signup() {
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Creating account...
+                  Sending code...
                 </>
               ) : (
                 <>
@@ -280,7 +452,6 @@ export default function Signup() {
             </Button>
           </form>
 
-          {/* Footer */}
           <div className="mt-8 pt-8 border-t border-border text-center">
             <p className="text-sm text-muted-foreground">
               Already have an account?{" "}
