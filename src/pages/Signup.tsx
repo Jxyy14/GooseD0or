@@ -252,10 +252,13 @@ export default function Signup() {
                 )}
               </div>
 
-              <div className="border border-border p-4 text-sm text-muted-foreground">
+              <div className="border border-border p-4 text-sm text-muted-foreground space-y-2">
                 <p className="flex items-start gap-2">
                   <Mail className="h-4 w-4 mt-0.5 shrink-0" strokeWidth={1.5} />
-                  Check your inbox and spam folder. The code expires in 1 hour.
+                  The email may take 30-60 seconds to arrive. Please also check your junk/spam folder.
+                </p>
+                <p className="text-xs text-muted-foreground/70 pl-6">
+                  The code expires in 1 hour.
                 </p>
               </div>
 
